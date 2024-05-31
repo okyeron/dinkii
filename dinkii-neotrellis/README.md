@@ -18,9 +18,12 @@ Requires a JST-SH to JST-SH (opposite side) connector cable.
 
 NeoTrellis and MechaTrellis use 5v so the STEMMA-QT connector defaults to 5v. If you need  3.3v instead for some other project, there is a 3-way jumper on the bottom of the board. For 3.3v, cut the trace between the center pad and the 5v pad, and then re-solder a bridge from the center pad to the 3.3v pad.
 
-## Software
+dink-ii boards ship with monome grid firmware installed in test mode (see board testing below)
 
-### Monome grid software
+
+## Firmware
+
+### Monome grid firmware
 
 If re-programming the grid software for NeoTrellis/MechaTrellis, be aware of the following section of `dinkii-neotrellis.ino`
 
