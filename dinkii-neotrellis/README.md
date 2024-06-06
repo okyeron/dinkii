@@ -33,6 +33,17 @@ dink-ii boards ship with monome grid firmware installed in test mode (see board 
 
 For general programming using Arduino see the [Adafruit Guide for RP2040](https://learn.adafruit.com/adafruit-feather-rp2040-pico/arduino-ide-setup)
 
+### PlatformIO / VSCode  
+
+The repo includes a PlatformIO configuration file and should work out of the box with VSCode.  
+
+You may need to install some items if you've never used PlatformIO.  
+
+On MacOS
+Ensure Homebrew in installed. [Instructions](https://brew.sh/)    
+Install PlatformIO CLI tools. [Detailed Instructions](https://platformio.org/install/cli)  
+Install PlatformIO IDE VSCode extension [Instructions](https://platformio.org/platformio-ide)  
+
 
 
 ### Monome grid firmware
