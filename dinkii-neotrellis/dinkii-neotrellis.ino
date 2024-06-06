@@ -35,7 +35,7 @@
 
 #include "i2c_config.h" // look here to change settings for different boards
 
-#define TEST 1    // SET TO 1 for testing
+#define TEST 0    // SET TO 1 for testing
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
@@ -44,7 +44,7 @@
 
 // Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
-#define GRIDCOUNT SIXTEEN
+#define GRIDCOUNT ONETWENTEIGHT
 #endif
 
 #if GRIDCOUNT == SIXTEEN
