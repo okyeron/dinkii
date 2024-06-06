@@ -92,6 +92,8 @@ const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36};
 
 If you want to test the LEDs on a single NeoTrellis/MechaTrellis board - which is advisable after purchase -  set the code above to the following
 
+i2c_config should be set to the 8x8 addresses for this test mode.  
+
 ```
 #define TEST 1    // SET TO 1 for testing
 
