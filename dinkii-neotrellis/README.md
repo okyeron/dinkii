@@ -23,6 +23,18 @@ dink-ii boards ship with monome grid firmware installed in test mode (see board 
 
 ## Firmware
 
+### How to program/flash the board:
+
+> To enter the bootloader, hold down the BOOTSEL button, and while continuing to hold it (don't let go!), press and release the reset button. Continue to hold the BOOTSEL button until the RPI-RP2 drive appears. Alternately you can hold the BOOTSEL button down while you plug the USB cable into your computer.
+
+> Once the RPI-RP2 drive shows up, your board is in bootloader mode. Then make sure you are no longer holding down any buttons (RST or BOOTSEL button).
+
+> Drag the appropriate UF2 file to the RPI-RP2 drive. The device will reset and should then function as expected.
+
+For general programming using Arduino see the [Adafruit Guide for RP2040](https://learn.adafruit.com/adafruit-feather-rp2040-pico/arduino-ide-setup)
+
+
+
 ### Monome grid firmware
 
 If re-programming the grid software for NeoTrellis/MechaTrellis, be aware of the following section of `dinkii-neotrellis.ino`
