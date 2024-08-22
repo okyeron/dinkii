@@ -35,66 +35,10 @@
 
 #include "i2c_config.h" // look here to change settings for different boards
 
-#define TEST 0    // SET TO 1 for testing
-
-#define SIXTEEN 1
-#define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
-#define TWOFIFTYSIX 4
-
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
-#ifndef GRIDCOUNT
-#define GRIDCOUNT ONETWENTEIGHT
-#endif
-
-#if GRIDCOUNT == SIXTEEN
-  #define NUM_ROWS 4 // down - rows 
-  #define NUM_COLS 4 // across - columns
-#endif
-#if GRIDCOUNT == SIXTYFOUR
-  #define NUM_ROWS 8 // down - rows 
-  #define NUM_COLS 8 // across - columns
-#endif
-#if GRIDCOUNT == ONETWENTEIGHT
-  #define NUM_ROWS 8 // down - rows 
-  #define NUM_COLS 16 // across - columns
-#endif
-#if GRIDCOUNT == TWOFIFTYSIX
-  #define NUM_ROWS 16 // down - rows 
-  #define NUM_COLS 16 // across - columns
-#endif
-
-#define NUM_LEDS NUM_ROWS*NUM_COLS
-
-#define INT_PIN 9
-// #define LED_PIN 13 // teensy LED used to show boot info
-#define LED_PIN 16 // dinkii LED1
-#define LED_PIN2 18 // dinkii LED2
-
-
-// This assumes you are using a USB breakout board to route power to the board 
-// If you are plugging directly into the controller, you will need to adjust this brightness to a much lower value
-#define BRIGHTNESS 64 // overall grid brightness - use gamma table below to adjust levels
-
-#define R 255
-#define G 255
-#define B 255
-
-// gamma table for 16 levels of brightness
-const uint8_t gammaTable[16] = { 0,  2,  3,  6,  11, 18, 25, 32, 41, 59, 70, 80, 92, 103, 115, 128}; 
-
+#include "config.h" // look here to change settings for different boards
 
 bool isInited = false;
 elapsedMillis monomeRefresh;
-
-// set your monome device name here
-String deviceID = "neo-monome";
-String serialNum = "m4216126";
-
-// DEVICE INFO FOR TinyUSB
-char mfgstr[32] = "monome";
-char prodstr[32] = "monome";
-char serialstr[32] = "m4216126";
 
 // Monome class setup
 MonomeSerialDevice mdp;
@@ -174,6 +118,9 @@ TrellisCallback keyCallback(keyEvent evt){
   return 0;
 }
 
+
+String serialNumberOne;
+String serialNumberTwo;
 // ***************************************************************************
 // **                                 SETUP                                 **
 // ***************************************************************************
@@ -183,10 +130,20 @@ void setup(){
 
 	TinyUSBDevice.setManufacturerDescriptor(mfgstr);
 	TinyUSBDevice.setProductDescriptor(prodstr);
-	TinyUSBDevice.setSerialDescriptor(serialstr);
-  
+	uint16_t tusb_serial[16];
+  int validindices = TinyUSBDevice.getSerialDescriptor(tusb_serial);
+  uint8_t serial_id[16] __attribute__((aligned(4)));
+  uint8_t const serial_len = TinyUSB_Port_GetSerialNumber(serial_id);
+  for (int i =0 ;i<8 ;i++) {
+    serialNumberOne = String(serial_id[i], DEC); 
+    serialNumberTwo.concat(serialNumberOne);
+  }
+  String tempSerial = serialNumberTwo.substring(9);
+  tempSerial.setCharAt(0, 'm');
+  TinyUSBDevice.setSerialDescriptor(tempSerial.c_str());
+
 	Serial.begin(115200);
-  
+
   // while( !TinyUSBDevice.mounted() ) delay(1);
 
 	MYWIRE.setSDA(I2C_SDA);
@@ -215,6 +172,8 @@ void setup(){
 		Serial.println("trellis.begin() failed!");
 		Serial.println("check your addresses.");
 		Serial.println("reset to try again.");
+    // Serial.println(serialNumberTwo);
+
 		while(1);  // loop forever
 	}
 
@@ -253,7 +212,7 @@ void setup(){
       delay(50);
   }
   #endif
-    
+
 }
 
 // ***************************************************************************
@@ -268,7 +227,7 @@ void sendLeds(){
   for(int i=0; i< NUM_ROWS * NUM_COLS; i++){
     value = mdp.leds[i];
     prevValue = prevLedBuffer[i];
-    uint8_t gvalue = gammaTable[value];
+    uint8_t gvalue = gammaTable[value] * gammaAdj;
     
     if (value != prevValue) {
       //hexColor = (((R * value) >> 4) << 16) + (((G * value) >> 4) << 8) + ((B * value) >> 4); 
