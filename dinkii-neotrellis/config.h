@@ -1,7 +1,7 @@
 #include <stdint.h> 
 #include <Arduino.h>
 
-#define TEST 1    // SET TO 1 for testing
+#define TEST 0    // SET TO 1 for testing
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
@@ -10,7 +10,7 @@
 
 // Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
-#define GRIDCOUNT SIXTEEN
+#define GRIDCOUNT ONETWENTEIGHT
 #endif
 
 #if GRIDCOUNT == SIXTEEN
@@ -50,10 +50,10 @@
 
 // gamma table for 16 levels of brightness
 const uint8_t gammaTable[16] = { 0,  2,  3,  6,  11, 18, 25, 32, 41, 59, 70, 80, 92, 103, 115, 127}; 
-const uint8_t gammaAdj = 2; // from 1 to 2
+const uint8_t gammaAdj = 1; // from 1 to 2
 
 // set your monome device name here
-String deviceID = "neo-monome";
+String deviceID = "monome";
 String serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB

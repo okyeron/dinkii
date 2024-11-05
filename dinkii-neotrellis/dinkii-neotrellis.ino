@@ -26,6 +26,7 @@
 //    Adafruit TinyUSB Library
 //    Adafruit NeoPixel
 
+
 #include "MonomeSerialDevice.h"
 #include <Adafruit_NeoTrellis.h>
 
@@ -36,6 +37,12 @@
 #include "i2c_config.h" // look here to change settings for different boards
 
 #include "config.h" // look here to change settings for different boards
+
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL343.h>
+Adafruit_ADXL343 accel = Adafruit_ADXL343(12345, &MYWIRE);
+
+
 
 bool isInited = false;
 elapsedMillis monomeRefresh;
@@ -149,8 +156,8 @@ void setup(){
 	MYWIRE.setSDA(I2C_SDA);
 	MYWIRE.setSCL(I2C_SCL);
 
-  Serial.println(I2C_SDA);
-  Serial.println(I2C_SCL);
+  // Serial.println(I2C_SDA);
+  // Serial.println(I2C_SCL);
 
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);
@@ -169,13 +176,26 @@ void setup(){
 	}
 
 	if (!trellis.begin()) {
-		Serial.println("trellis.begin() failed!");
-		Serial.println("check your addresses.");
-		Serial.println("reset to try again.");
+		// Serial.println("trellis.begin() failed!");
+		// Serial.println("check your addresses.");
+		// Serial.println("reset to try again.");
     // Serial.println(serialNumberTwo);
 
 		while(1);  // loop forever
 	}
+  
+  // ADXL343 Accelerometer init
+  /* Initialise the sensor */
+  if(!accel.begin())
+  {
+    /* There was a problem detecting the ADXL343 ... check your connections */
+    // Serial.println("No ADXL343 detected ... Check your wiring!");
+    // while(1);
+  }
+  /* Set the range to whatever is appropriate for your project */
+  accel.setRange(ADXL343_RANGE_16_G); // 2/4/8/16 _G
+  accel.setDataRate(ADXL343_DATARATE_100_HZ);
+
 
 	// key callback
 	for (x = 0; x < NUM_COLS; x++) {
@@ -244,21 +264,50 @@ void sendLeds(){
 
 }
 
-
-
 // ***************************************************************************
 // **                                 LOOP                                  **
 // ***************************************************************************
 
 void loop() {
 
+    sensors_event_t event;
+    accel.getEvent(&event);
+    int16_t axis[3];
+    axis[0] = (event.acceleration.x * 2) + 128;
+    axis[1] = (event.acceleration.y * 2) + 128;
+    axis[2] = (event.acceleration.z * 2) + 128;
+    int8_t *axisbytes = (int8_t *)axis;
+    // axisbytes[0],axisbytes[1]
+
     mdp.poll(); // process incoming serial from Monomes
  
+
     // refresh every 16ms or so
     if (isInited && monomeRefresh > 16) {
+        if (mdp.tiltState[0]){
+          mdp.sendTiltEvent(0,axisbytes[0],axisbytes[1],axisbytes[2],axisbytes[3],axisbytes[4],axisbytes[5]);
+        }
         trellis.read();
         sendLeds();
         monomeRefresh = 0;
     }
 
+//     // Send tilt data every 100ms
+//     if (currentMillis - lastTiltCheck >= 100) {
+//         lastTiltCheck = currentMillis;
+//         sendTiltData();
+//     }
+
 }
+
+// void sendTiltData() {
+//     sensors_event_t a, g, temp;
+//     mpu.getEvent(&a, &g, &temp);
+// 
+//     // Scale gyro data to 16-bit integer range
+//     int16_t x = (int16_t)(g.gyro.x * 1000);
+//     int16_t y = (int16_t)(g.gyro.y * 1000);
+//     int16_t z = (int16_t)(g.gyro.z * 1000);
+// 
+//     mdp.sendTiltEvent(0, x, y, z);
+// }
