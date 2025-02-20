@@ -19,7 +19,7 @@
 #endif
 
 // SET YOUR ADDRESSES 
-// 8x8
+// 8x8 or 4x4 TEST
 // const uint8_t addrRowOne[2] = {0x2F,0x2E}; 
 // const uint8_t addrRowTwo[2] = {0x3E,0x36}; 
 

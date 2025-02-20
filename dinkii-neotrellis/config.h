@@ -40,7 +40,7 @@
 
 // This assumes you are using a USB breakout board to route power to the board 
 // If you are plugging directly into the controller, you will need to adjust this brightness to a much lower value
-#define BRIGHTNESS 255  // overall grid brightness 
+#define BRIGHTNESS 127  // overall grid brightness 
                         // may need adjustment for larger grids
                         // use gammaTable and gammaAdj below to adjust levels
 
@@ -58,5 +58,5 @@ String serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB
 char mfgstr[32] = "monome";
-char prodstr[32] = "monome";
+char prodstr[32] = "grid";
 char serialstr[32] = "m4216126";

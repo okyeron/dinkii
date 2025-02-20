@@ -114,11 +114,17 @@ TrellisCallback keyCallback(keyEvent evt){
   if(evt.bit.EDGE == SEESAW_KEYPAD_EDGE_RISING){
 //     Serial.println(" pressed ");
     mdp.sendGridKey(x, y, 1);
-    // trellis.setPixelColor(evt.bit.NUM, Wheel(map(evt.bit.NUM, 0, NUM_ROWS, 0, 255))); //on rising
+    #if TEST
+      trellis.setPixelColor(evt.bit.NUM, Wheel(map(evt.bit.NUM, 0, NUM_ROWS, 0, 255))); //on rising
+      trellis.show();
+    #endif
   }else if(evt.bit.EDGE == SEESAW_KEYPAD_EDGE_FALLING){
 //     Serial.println(" released ");
     mdp.sendGridKey(x, y, 0);
-    // trellis.setPixelColor(evt.bit.NUM, 0); //off falling
+    #if TEST
+      trellis.setPixelColor(evt.bit.NUM, 0); //off falling
+      trellis.show();
+    #endif
   }
   sendLeds();
   // trellis.show();
@@ -281,7 +287,6 @@ void loop() {
 
     mdp.poll(); // process incoming serial from Monomes
  
-
     // refresh every 16ms or so
     if (isInited && monomeRefresh > 16) {
         if (mdp.tiltState[0]){
