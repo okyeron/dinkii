@@ -51,7 +51,7 @@ void MonomeSerialDevice::poll() {
 }
 
 
-void MonomeSerialDevice::setAllLEDs(int value) {
+void MonomeSerialDevice::setAllLEDs(uint8_t value) {
   for (int i = 0; i < MAXLEDCOUNT; i++) leds[i] = value;
 }
 
@@ -255,8 +255,9 @@ void MonomeSerialDevice::processSerial() {
 
         case 0x02:  // system / write ID
             //Serial.println("0x02");
+            deviceID.clear();
             for (int i = 0; i < 32; i++) {  // has to be 32
-                deviceID[i] = tud_cdc_read_char();
+                deviceID += (char)tud_cdc_read_char();
             }
             break;
 
@@ -299,6 +300,7 @@ void MonomeSerialDevice::processSerial() {
         case 0x0F:  // system / report firmware version
             // Serial.println("0x0F");
             for (int i = 0; i < 8; i++) {  // 8 character string
+              dummy = tud_cdc_read_char();
                 //Serial.print(tud_cdc_read_char());
             }
             break;
@@ -592,8 +594,14 @@ void MonomeSerialDevice::processSerial() {
             break;
 
         case 0x80:  //   tilt / active response - 9 bytes [0x01, d]
+            for (int i = 0; i < 9; i++) {  // 9 bytes
+              dummy = tud_cdc_read_char();  // consume bytes
+            }
             break;
         case 0x81:  //   tilt - 8 bytes [0x80, n, xh, xl, yh, yl, zh, zl]
+            for (int i = 0; i < 8; i++) {  // 8 bytes
+              dummy = tud_cdc_read_char();  // consume bytes
+            }
             break;
 
         // 0x90 variable 64 LED ring 
@@ -689,7 +697,7 @@ void MonomeSerialDevice::processSerial() {
             }
             for (x = 0; x < readY; x++) {
               //led_array[readN][x] = readA;
-              setArcLed(readN, y, readA);
+              setArcLed(readN, x, readA);
             }
           }
           //note:   set range x1-x2 (inclusive) to a. wrapping supported, ie. set range 60,4 would set values 60,61,62,63,0,1,2,3,4. 
@@ -792,3 +800,15 @@ void MonomeEventQueue::sendGridKey(uint8_t x, uint8_t y, uint8_t pressed) {
     tud_cdc_write_char((uint8_t)x);
     tud_cdc_write_char((uint8_t)y);
 }
+
+void MonomeEventQueue::sendTiltEvent(uint8_t n,int8_t xh,int8_t xl,int8_t yh,int8_t yl,int8_t zh,int8_t zl)
+{    
+    tud_cdc_write_char((uint8_t)0x81);
+    tud_cdc_write_char((uint8_t)n);
+    tud_cdc_write_char((int8_t)xh);
+    tud_cdc_write_char((int8_t)xl);
+    tud_cdc_write_char((int8_t)yh);
+    tud_cdc_write_char((int8_t)yl);
+    tud_cdc_write_char((int8_t)zh);
+    tud_cdc_write_char((int8_t)zl);
+ }

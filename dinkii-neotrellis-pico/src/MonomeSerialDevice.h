@@ -28,19 +28,16 @@ class MonomeEventQueue {
         
         bool gridEventAvailable();
         MonomeGridEvent readGridEvent();
-        MonomeGridEvent sendGridKey();
 
         bool arcEventAvailable();
         MonomeArcEvent readArcEvent();
-        MonomeArcEvent sendArcDelta();
-        MonomeArcEvent sendArcKey();
        
         void addGridEvent(uint8_t x, uint8_t y, uint8_t pressed);
         void sendGridKey(uint8_t x, uint8_t y, uint8_t pressed);
         void addArcEvent(uint8_t index, int8_t delta);
         void sendArcDelta(uint8_t index, int8_t delta);
         void sendArcKey(uint8_t index, uint8_t pressed);
-        void sendTiltEvent(uint8_t n,uint8_t xh,uint8_t xl, uint8_t yh,uint8_t yl, uint8_t zh,uint8_t zl);
+        void sendTiltEvent(uint8_t n, int8_t xh, int8_t xl, int8_t yh, int8_t yl, int8_t zh, int8_t zl);
 
     protected:
         
@@ -71,7 +68,7 @@ class MonomeSerialDevice : public MonomeEventQueue {
         void setGridLed(uint8_t x, uint8_t y, uint8_t level);
         void clearGridLed(uint8_t x, uint8_t y);
         void setArcLed(uint8_t enc, uint8_t led, uint8_t level);
-        void setAllLEDs(int value);
+        void setAllLEDs(uint8_t value);
         void clearArcLed(uint8_t enc, uint8_t led);
         void clearAllLeds();
         void clearArcRing(uint8_t ring);
@@ -84,8 +81,8 @@ class MonomeSerialDevice : public MonomeEventQueue {
         uint8_t rows;
         uint8_t columns;
         uint8_t encoders;
-        uint8_t gridX;
-        uint8_t gridY;
+        // uint8_t gridX;
+        // uint8_t gridY;
 
         static const int variMonoThresh = 0;
         static const int MAXLEDCOUNT = 256;
