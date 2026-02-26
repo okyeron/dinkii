@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 842 596" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;">
+    <g transform="matrix(2.83465,0,0,2.83465,0,0)">
+        <path d="M32.54,45.013L69.068,45.013" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <circle cx="68.378" cy="42.655" r="1.4" style="fill:none;stroke:black;stroke-width:0.18px;"/>
+        <path d="M70.593,40.529C70.593,40.529 70.593,40.529 70.593,40.529C70.593,40.803 70.819,41.029 71.093,41.029C71.095,41.029 71.097,41.029 71.1,41.029" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M69.065,25.024L32.54,25.024" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <circle cx="33.058" cy="42.655" r="1.4" style="fill:none;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.605,27.564C71.605,26.17 70.459,25.024 69.065,25.024" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.605,28.508L71.605,27.564" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M30,42.473L30,27.564" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.608,42.473L71.606,41.528" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.095,29.008C71.099,29.008 71.102,29.008 71.105,29.008C71.38,29.008 71.605,28.782 71.605,28.508" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M69.068,45.013C70.461,45.013 71.608,43.866 71.608,42.473" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.105,29.008L71.095,29.008" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <circle cx="68.365" cy="27.394" r="1.4" style="fill:none;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.105,29.008C71.102,29.008 71.099,29.008 71.095,29.008C70.821,29.008 70.595,29.233 70.595,29.508" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M30,42.473C30,43.867 31.147,45.013 32.54,45.013" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.606,41.528C71.606,41.254 71.38,41.029 71.106,41.029C71.102,41.029 71.097,41.029 71.093,41.029" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M32.54,25.024C31.147,25.024 30,26.171 30,27.564" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <path d="M71.106,41.029L71.093,41.029" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <circle cx="33.071" cy="27.394" r="1.4" style="fill:none;stroke:black;stroke-width:0.18px;"/>
+        <path d="M70.593,40.529L70.595,29.508" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:0.18px;"/>
+        <g transform="matrix(0.352778,0,0,0.352778,-5.71613,2.83652)">
+            <g transform="matrix(11,0,0,11,204.511,136.406)">
+            </g>
+            <text x="119.545px" y="136.406px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:11px;">41.6mm x 20mm</text>
+        </g>
+    </g>
+</svg>

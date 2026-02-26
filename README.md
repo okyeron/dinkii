@@ -6,6 +6,12 @@ IMPORTANT - by default dink-ii sends 5v over the STEMMA-QT connector. If you nee
 
 dink-ii uses a standard STEMMA-QT (JST-SH) connector for i2c.
 
+## Dimensions
+
+41.6mm x 20mm 
+
+[Board outline file with holes](<dinkii-outline.svg>)
+
 ## Programming notes
 
 i2c is set to the `i2c1` bus, so use `Wire1` in Arduino. i2c Pins are `SDA = 2` and `SCL = 3`
@@ -20,3 +26,4 @@ in Arduino you would configure this in `setup()` with
 ## 5v jumper
 
 The STEMMA-QT connector on dink-ii defaults to using 5v. If you need  3.3v instead for some other project, there is a 3-way jumper on the bottom of the board. For 3.3v, cut the trace between the center pad and the 5v pad, and then re-solder a bridge from the center pad to the 3.3v pad.
+
