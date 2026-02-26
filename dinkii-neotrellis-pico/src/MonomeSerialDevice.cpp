@@ -685,18 +685,15 @@ void MonomeSerialDevice::processSerial() {
           //memset(led_array[readN],0,sizeof(led_array[readN]));
       
           if (readX < readY){
-            for (y = readX; y < readY; y++) {
-              //led_array[readN][y] = readA;
+            for (y = readX; y <= readY; y++) {
               setArcLed(readN, y, readA);
             }
           }else{
-            // wrapping?
+            // wrapping
             for (y = readX; y < 64; y++) {
-              //led_array[readN][y] = readA;
               setArcLed(readN, y, readA);
             }
-            for (x = 0; x < readY; x++) {
-              //led_array[readN][x] = readA;
+            for (x = 0; x <= readY; x++) {
               setArcLed(readN, x, readA);
             }
           }
