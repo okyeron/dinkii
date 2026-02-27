@@ -3,4 +3,4 @@
 	url = https://codeberg.org/tehn/iii
 [submodule "dinkii-neotrellis-iii/src/littlefs"]
 	path = dinkii-neotrellis-iii/src/littlefs
-	url = https://codeberg.org/tehn/littlefs
+	url = https://github.com/littlefs-project/littlefs.git
