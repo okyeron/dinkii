@@ -1,6 +1,6 @@
-#include <stdint.h>
 #include <stdlib.h>
 #include "pico/stdlib.h"
+#include <stdint.h>
 
 #define TEST 0 // SET TO 1 for testing
 
@@ -21,24 +21,24 @@
 #if GRIDCOUNT == SIXTYFOUR
 #define NUM_ROWS 8 // down - rows
 #define NUM_COLS 8 // across - columns
-const uint8_t addrRowOne[2] = {0x2F,0x2E}; 
-const uint8_t addrRowTwo[2] = {0x3E,0x36}; 
+static const uint8_t addrRowOne[2] = {0x2F,0x2E}; 
+static const uint8_t addrRowTwo[2] = {0x3E,0x36}; 
 #endif
 #if GRIDCOUNT == ONETWENTEIGHT
 #define NUM_ROWS 8  // down - rows
 #define NUM_COLS 16 // across - columns
 // denki-oto mecha-layout
-const uint8_t addrRowOne[4] = {0x3E,0x36,0x2F,0x2E}; 
-const uint8_t addrRowTwo[4] = {0x33,0x31,0x32,0x30}; 
+static const uint8_t addrRowOne[4] = {0x3E,0x36,0x2F,0x2E}; 
+static const uint8_t addrRowTwo[4] = {0x33,0x31,0x32,0x30}; 
 #endif
 #if GRIDCOUNT == TWOFIFTYSIX
 #define NUM_ROWS 16 // down - rows
 #define NUM_COLS 16 // across - columns
 // for 16x16
-// const uint8_t addrRowOne[4] = {0x32,0x30,0x2F,0x2E}; 
-// const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36}; 
-// const uint8_t addrRowThree[4] = {0x3c,0x40,0x38,0x34}; 
-// const uint8_t addrRowFour[4] = {0x46,0x4a,0x42,0x3a}; 
+// static const uint8_t addrRowOne[4] = {0x32,0x30,0x2F,0x2E}; 
+// static const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36}; 
+// static const uint8_t addrRowThree[4] = {0x3c,0x40,0x38,0x34}; 
+// static const uint8_t addrRowFour[4] = {0x46,0x4a,0x42,0x3a}; 
 
 #endif
 
@@ -71,9 +71,10 @@ const char* deviceID = "monome";
 const char* serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB
-char mfgstr[32] = "monome";
-char prodstr[32] = "grid";
-char serialstr[32] = "m4216126";
+// static: prevents multiple-definition errors when included from multiple TUs
+static char mfgstr[32] = "monome";
+static char prodstr[32] = "grid";
+static char serialstr[32] = "m4216126";
 
 #define mapRange(s,a1,a2,b1,b2) (b1 + (s-a1)*(b2-b1)/(a2-a1))
 

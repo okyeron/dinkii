@@ -21,6 +21,9 @@ project(dinkii-neotrellis-iii C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+# Export compile commands for IDE IntelliSense (clangd / VS Code)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(PICO_BOARD "board_dinkii")
 
 # Initialize the Pico SDK
@@ -34,7 +37,7 @@ add_custom_command(
             ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.h
             ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.c
         COMMAND
-            python ${CMAKE_SOURCE_DIR}/src/tools/embed.py ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua ${CMAKE_SOURCE_DIR}/src/iii/resource
+            python3 ${CMAKE_SOURCE_DIR}/src/tools/embed.py ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua ${CMAKE_SOURCE_DIR}/src/iii/resource
         DEPENDS
             ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua
 )
@@ -44,6 +47,7 @@ add_custom_target(embedded_resources DEPENDS ${CMAKE_SOURCE_DIR}/src/iii/lua/lib
 # Main executable
 add_executable(dinkii-neotrellis-iii
     src/dinkii-neotrellis.cpp
+    src/device.cpp
     src/MonomeSerialDevice.cpp
     src/debug.cpp
     src/Adafruit_seesaw/Adafruit_NeoTrellis.cpp
@@ -66,6 +70,9 @@ add_executable(dinkii-neotrellis-iii
 
 # Build defines — mirrors -DUSE_TINYUSB from platformio.ini
 target_compile_definitions(dinkii-neotrellis-iii PRIVATE
+    LUA_COMPAT_5_2
+    LUA_USE_C89
+
     USE_TINYUSB=1
     # Uncomment to change grid size (default is ONETWENTEIGHT = 128 keys / 16x8):
     # GRIDCOUNT = SIXTEEN   # (4x4)
@@ -73,9 +80,16 @@ target_compile_definitions(dinkii-neotrellis-iii PRIVATE
     # GRIDCOUNT = ONETWENTEIGHT     # (16x8)
     # GRIDCOUNT = TWOFIFTYSIX       # (16x16)
 )
+# # Force-include the Lua 5.4↔5.5 compatibility shim for iii's vm.c only.
+# # vm.c calls lua_newstate(f,ud,seed) and luaL_makeseed(L) which are Lua 5.5 APIs.
+# set_source_files_properties(src/iii/vm.c PROPERTIES
+#     COMPILE_OPTIONS "-include;${CMAKE_CURRENT_SOURCE_DIR}/src/iii_lua_compat.h"
+# )
+
 
 # Include directories (headers live at the project root)
 target_include_directories(dinkii-neotrellis-iii PUBLIC
+    ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/usb
     ${CMAKE_SOURCE_DIR}/src/iii
     ${CMAKE_SOURCE_DIR}/src/lua
@@ -85,17 +99,17 @@ target_include_directories(dinkii-neotrellis-iii PUBLIC ${CMAKE_CURRENT_LIST_DIR
 
 # add littleFS, built as separate static library
 set(LFS_INCLUDES
-        ${CMAKE_SOURCE_DIR}/src/littlefs
+    ${CMAKE_SOURCE_DIR}/src/littlefs
 )
 set(LFS_SOURCES
-        ${CMAKE_SOURCE_DIR}/src/littlefs/lfs.c
-				${CMAKE_SOURCE_DIR}/src/littlefs/lfs_util.c
+    ${CMAKE_SOURCE_DIR}/src/littlefs/lfs.c
+	${CMAKE_SOURCE_DIR}/src/littlefs/lfs_util.c
 )
 add_library(lfs STATIC
-        ${LFS_SOURCES}
+    ${LFS_SOURCES}
 )
 target_include_directories(lfs PUBLIC
-        ${LFS_INCLUDES}
+    ${LFS_INCLUDES}
 )
 target_compile_options(lfs PRIVATE -Wall -Wextra -Wpedantic)
 target_include_directories(dinkii-neotrellis-iii PRIVATE ${LFS_INCLUDES})
