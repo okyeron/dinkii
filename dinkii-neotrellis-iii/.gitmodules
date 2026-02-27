@@ -1,6 +1,0 @@
-[submodule "iii"]
-	path = iii
-	url = ssh://git@codeberg.org/tehn/iii.git
-[submodule "littlefs"]
-	path = littlefs
-	url = ssh://git@codeberg.org/tehn/littlefs.git
