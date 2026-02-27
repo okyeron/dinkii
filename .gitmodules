@@ -1,3 +1,6 @@
 [submodule "dinkii-neotrellis-iii/src/iii"]
 	path = dinkii-neotrellis-iii/src/iii
 	url = https://codeberg.org/tehn/iii
+[submodule "dinkii-neotrellis-iii/src/littlefs"]
+	path = dinkii-neotrellis-iii/src/littlefs
+	url = https://github.com/littlefs-project/littlefs.git
