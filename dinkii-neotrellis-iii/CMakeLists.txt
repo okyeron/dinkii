@@ -1,0 +1,77 @@
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 2.2.0)
+set(toolchainVersion 14_2_Rel1)
+set(picotoolVersion 2.2.0-a4)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if(EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+cmake_minimum_required(VERSION 3.13)
+
+# Pull in the Pico SDK (must be before project())
+include(pico_sdk_import.cmake)
+
+project(dinkii-neotrellis C CXX ASM)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+
+set(PICO_BOARD "board_dinkii")
+
+# Initialize the Pico SDK
+pico_sdk_init()
+
+# Main executable
+add_executable(dinkii-neotrellis
+    src/dinkii-neotrellis.cpp
+    src/MonomeSerialDevice.cpp
+    src/debug.cpp
+    src/Adafruit_seesaw/Adafruit_NeoTrellis.cpp
+    src/Adafruit_seesaw/Adafruit_seesaw.cpp
+    src/Adafruit_seesaw/Adafruit_I2CDevice.cpp
+    src/Adafruit_seesaw/seesaw_neopixel.cpp
+    src/usb/usb_descriptors.cpp
+)
+
+# Build defines — mirrors -DUSE_TINYUSB from platformio.ini
+target_compile_definitions(dinkii-neotrellis PRIVATE
+    USE_TINYUSB=1
+    # Uncomment to change grid size (default is ONETWENTEIGHT = 128 keys / 16x8):
+    # GRIDCOUNT = SIXTEEN   # (4x4)
+    # GRIDCOUNT = SIXTYFOUR   # (8x8)
+    # GRIDCOUNT = ONETWENTEIGHT     # (16x8)
+    # GRIDCOUNT = TWOFIFTYSIX       # (16x16)
+)
+
+# Include directories (headers live at the project root)
+target_include_directories(dinkii-neotrellis PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/src/usb
+)
+
+
+# pico-sdk link targets
+target_link_libraries(dinkii-neotrellis
+    pico_stdlib
+    pico_printf
+    hardware_i2c
+    hardware_gpio
+    tinyusb_board
+    tinyusb_device
+    pico_unique_id
+)
+
+# USB CDC is used directly via TinyUSB (tud_cdc_*), so stdio USB must be
+# disabled to avoid the SDK driver competing for the same CDC interface.
+# pico_enable_stdio_usb(dinkii-neotrellis 0)
+
+# Route debug printf to UART instead (or disable entirely by leaving both 0).
+# pico_enable_stdio_uart(dinkii-neotrellis 0)
+
+# Generate UF2 and other binary output formats
+pico_add_extra_outputs(dinkii-neotrellis)

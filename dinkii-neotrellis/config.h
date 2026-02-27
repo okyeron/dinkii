@@ -40,13 +40,13 @@
 
 // This assumes you are using a USB breakout board to route power to the board 
 // If you are plugging directly into the controller, you will need to adjust this brightness to a much lower value
-#define BRIGHTNESS 127  // overall grid brightness 
+#define BRIGHTNESS 96  // overall grid brightness 
                         // may need adjustment for larger grids
                         // use gammaTable and gammaAdj below to adjust levels
 
 #define R 255
-#define G 255
-#define B 255
+#define G 204
+#define B 51
 
 // gamma table for 16 levels of brightness
 const uint8_t gammaTable[16] = { 0,  2,  3,  6,  11, 18, 25, 32, 41, 59, 70, 80, 92, 103, 115, 127}; 

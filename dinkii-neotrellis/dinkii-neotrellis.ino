@@ -151,7 +151,7 @@ void setup(){
     serialNumberOne = String(serial_id[i], DEC); 
     serialNumberTwo.concat(serialNumberOne);
   }
-  String tempSerial = serialNumberTwo.substring(9);
+  String tempSerial = serialNumberTwo.substring(10);
   tempSerial.setCharAt(0, 'm');
   TinyUSBDevice.setSerialDescriptor(tempSerial.c_str());
 
