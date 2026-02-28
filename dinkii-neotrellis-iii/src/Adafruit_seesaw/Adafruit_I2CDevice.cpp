@@ -9,7 +9,7 @@
 #define I2C_PORT i2c1
 #define I2C_SDA 2
 #define I2C_SCL 3
-#define I2C_BAUDRATE 100000
+#define I2C_BAUDRATE 400000
 
 // Optional callback to service USB during long init sequences
 static void (*poll_callback)(void) = NULL;

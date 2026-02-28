@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include "pico/stdlib.h"
+#include "pico/multicore.h"
 #include "config.h"
 #include "bsp/board.h"
 #include "tusb.h"
@@ -26,15 +27,24 @@ extern "C" {
 // USB descriptor selector — read by tud_descriptor_device_cb() in usb_descriptors.cpp
 //   0 = DINKII descriptor (CDC+MIDI, used for iii/REPL mode)
 //   1 = MONOME descriptor  (CDC+MIDI, monome VID/PID)
-uint8_t g_monome_mode = 1;
+uint8_t g_monome_mode = 0;
 
 // Current device mode — also read by device.cpp for dispatch decisions
 //   0 = iii (Lua scripting)
 //   1 = monome serial protocol
-uint8_t mode = 1;
+uint8_t mode = 0;
 
 // Defined in device.cpp — blocking monome protocol loop
 extern "C" void device_monome_loop();
+
+// Core 1: lockout victim for safe flash operations from core 0.
+// lfs_erase/lfs_prog in fs.c call multicore_lockout_start_blocking(),
+// which requires the other core to have registered a lockout handler.
+static void core1_entry() {
+    multicore_lockout_victim_init();
+    multicore_fifo_push_blocking(1); // signal core 0 that handler is ready
+    while (true) tight_loop_contents();
+}
 
 // ***************************************************************************
 // **                                 SETUP                                 **
@@ -46,8 +56,10 @@ void SetupBoard() {
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
+    gpio_init(LED_PIN2);
+    gpio_set_dir(LED_PIN2, GPIO_OUT);
+    // gpio_put(LED_PIN2, 1);
 
-    tusb_init();
 }
 
 // ***************************************************************************
@@ -60,39 +72,51 @@ int main() {
     flash_init();
 
     bool run_script = true;
-    bool reset = check_device_key(); // true if a grid key is held at boot
-    mode = flash_read_mode();
-
-    if (reset) {
-        if (mode == 1) {
-            // monome → iii
-            flash_write_mode(0);
-            mode = 0;
-            // Keep holding to skip init.lua (useful for recovery)
-            uint16_t count = 0;
-            while (check_device_key() && count < 256) {
-                sleep_ms(10);
-                count++;
-            }
-            if (count >= 256) run_script = false;
-        } else {
-            // iii → monome
-            flash_write_mode(1);
-            mode = 1;
-        }
-    }
 
     // Set USB descriptor before tusb_init() so enumeration uses correct IDs:
     //   mode 0 (iii)    → DINKII USB  (needs CDC for REPL)
     //   mode 1 (monome) → MONOME USB  (monome VID/PID for host compatibility)
-    g_monome_mode = mode;
+    // g_monome_mode = mode;
 
     SetupBoard();
-    device_init(); // NeoTrellis hardware init (shared by both modes)
+    device_init(); // NeoTrellis hardware init — slow I2C, must finish before USB starts
+    tusb_init();   // enable USB pull-up only after blocking init is done
+
+
+    // bool reset = check_device_key(); // true if a grid key is held at boot
+    // mode = flash_read_mode();
+
+    // if (reset) {
+    //     if (mode == 1) {
+    //         // monome → iii
+    //         flash_write_mode(0);
+    //         mode = 0;
+    //         // Keep holding to skip init.lua (useful for recovery)
+    //         uint16_t count = 0;
+    //         while (check_device_key() && count < 256) {
+    //             sleep_ms(10);
+    //             count++;
+    //         }
+    //         if (count >= 256) run_script = false;
+    //     } else {
+    //         // iii → monome
+    //         flash_write_mode(1);
+    //         mode = 1;
+    //     }
+    // }
+
+
+    // Start core 1 as a multicore lockout victim before any LFS flash
+    // operations (lfs_format, lfs_prog, lfs_erase). Core 1 does nothing
+    // else; we wait for it to signal that its lockout handler is registered.
+    multicore_launch_core1(core1_entry);
+    multicore_fifo_pop_blocking(); // wait until core 1 handler is ready
 
     if (mode == 0) {
+        gpio_put(LED_PIN2, 1);  // blue
         iii_loop(run_script); // never returns; calls device_task() internally
     } else {
+        gpio_put(LED_PIN, 1);   // red
         device_monome_loop(); // never returns
     }
 

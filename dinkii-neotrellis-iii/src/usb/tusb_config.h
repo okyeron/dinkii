@@ -76,6 +76,8 @@ extern "C" {
 #define CFG_TUD_ENDPOINT0_SIZE    64
 #endif
 
+#define CFG_TUD_ENABLED             1
+
 //------------- CLASS -------------//
 #define CFG_TUD_CDC             1
 #define CFG_TUD_MSC             0

@@ -222,6 +222,8 @@ extern "C" void device_init() {
     memset(prevLedBuffer, 0, sizeof(prevLedBuffer));
     sendLeds_iii(); // push zeros to hardware
 
+    gpio_put(LED_PIN, 0);
+
     // Single startup blink on key 0
     trellis.setPixelColor(0, 0xFFFFFF);
     trellis.show();

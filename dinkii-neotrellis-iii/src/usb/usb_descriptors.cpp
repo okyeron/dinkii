@@ -29,6 +29,7 @@
 #define USB_VID   0xCafe
 #define USB_BCD   0x0200
 
+static char serial_str[16];
 
 /* A combination of interfaces must have a unique product id, since PC will save device driver after the first plug.
  * Same VID/PID with different interface e.g MSC (first), then CDC (later) will possibly cause system error on PC.
@@ -65,12 +66,12 @@ enum {
 // const static char const *string_desc_arr[] = {
 char const* string_desc_arr [] = {
     (const char[]){0x09, 0x04}, // 0: supported language is English (0x0409)
-    "denki-oto",                // 1: Manufacturer
-    "dinkii",                      // 2: Product  // rin is \u30ea\u30f3 in unicode
-    NULL,                       // 3: Serial Number
-    "dinkii cdc",                  // 4: Serial Port
-    "dinkii midi",                 // 5: MIDI
-    "dinkii webusb",               // 6: Vendor
+    "monome",                // 1: Manufacturer
+    "iii",                      // 2: Product
+    serial_str,                 // 3: Serial Number
+    "dinkii cdc",               // 4: Serial Port
+    "dinkii midi",              // 5: MIDI
+    "dinkii webusb",            // 6: Vendor
     "monome",                   // 7: Manufacturer Monome
     "grid",               // 8: Product Monome
     ""
@@ -89,15 +90,15 @@ tusb_desc_device_t const desc_devices[2] =
 { ////DINKII
     {.bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
-    .bcdUSB             = USB_BCD,
+    .bcdUSB             = 0x0200,
     .bDeviceClass       = TUSB_CLASS_MISC,
     .bDeviceSubClass    = MISC_SUBCLASS_COMMON,
     .bDeviceProtocol    = MISC_PROTOCOL_IAD,
     .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
 
     .idVendor           = USB_VID,
-    .idProduct          = USB_PID,
-    .bcdDevice          = USBD_DEV,
+    .idProduct          = 0x1101,
+    .bcdDevice          = 0x0100,
 
     .iManufacturer = STRING_MANUFACTURER,
     .iProduct = STRING_PRODUCT,
@@ -164,7 +165,7 @@ enum
   
 
   #define EPNUM_MIDI_OUT   0x04
-  #define EPNUM_MIDI_IN   0x04
+  #define EPNUM_MIDI_IN   0x84
 #endif
 
 uint8_t const desc_fs_configuration[] =
@@ -176,7 +177,8 @@ uint8_t const desc_fs_configuration[] =
   TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, STRING_CDC, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
 
   // Interface number, string index, EP Out & EP In address, EP size
-  TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, (0x80 | EPNUM_MIDI_IN), 64)
+  TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, EPNUM_MIDI_IN, 64)
+  // TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, (0x80 | EPNUM_MIDI_IN), 64)
 };
 
 #if TUD_OPT_HIGH_SPEED

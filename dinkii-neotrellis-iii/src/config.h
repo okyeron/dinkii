@@ -58,17 +58,17 @@ static const uint8_t addrRowTwo[4] = {0x33,0x31,0x32,0x30};
      // use gammaTable and gammaAdj below to adjust levels
 
 #define R 255
-#define G 204
-#define B 51
+#define G 255
+#define B 255
 
 // gamma table for 16 levels of brightness
-const uint8_t gammaTable[16] = {0,  2,  3,  6,  11, 18,  25,  32,
-                                41, 59, 70, 80, 92, 103, 115, 127};
-const uint8_t gammaAdj = 1; // from 1 to 2
+static const uint8_t gammaTable[16] = {0,  2,  3,  6,  11, 18,  25,  32,
+                                       41, 59, 70, 80, 92, 103, 115, 127};
+static const uint8_t gammaAdj = 1; // from 1 to 2
 
 // set your monome device name here
-const char* deviceID = "monome";
-const char* serialNum = "m4216126";
+static const char* deviceID = "monome";
+static const char* serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB
 // static: prevents multiple-definition errors when included from multiple TUs

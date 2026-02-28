@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Export compile commands for IDE IntelliSense (clangd / VS Code)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(PICO_BOARD "board_dinkii")
+set(PICO_BOARD pico CACHE STRING "Board type")
 
 # Initialize the Pico SDK
 pico_sdk_init()
@@ -72,13 +72,7 @@ add_executable(dinkii-neotrellis-iii
 target_compile_definitions(dinkii-neotrellis-iii PRIVATE
     LUA_COMPAT_5_2
     LUA_USE_C89
-
     USE_TINYUSB=1
-    # Uncomment to change grid size (default is ONETWENTEIGHT = 128 keys / 16x8):
-    # GRIDCOUNT = SIXTEEN   # (4x4)
-    # GRIDCOUNT = SIXTYFOUR   # (8x8)
-    # GRIDCOUNT = ONETWENTEIGHT     # (16x8)
-    # GRIDCOUNT = TWOFIFTYSIX       # (16x16)
 )
 # # Force-include the Lua 5.4↔5.5 compatibility shim for iii's vm.c only.
 # # vm.c calls lua_newstate(f,ud,seed) and luaL_makeseed(L) which are Lua 5.5 APIs.
@@ -111,7 +105,7 @@ add_library(lfs STATIC
 target_include_directories(lfs PUBLIC
     ${LFS_INCLUDES}
 )
-target_compile_options(lfs PRIVATE -Wall -Wextra -Wpedantic)
+target_compile_options(lfs PRIVATE -Wall -Wextra -Wpedantic -Wno-unused-function)
 target_include_directories(dinkii-neotrellis-iii PRIVATE ${LFS_INCLUDES})
 target_link_libraries(dinkii-neotrellis-iii PRIVATE lfs)
 
@@ -132,12 +126,9 @@ target_link_libraries(dinkii-neotrellis-iii PUBLIC
     tinyusb_device
 )
 
-# USB CDC is used directly via TinyUSB (tud_cdc_*), so stdio USB must be
-# disabled to avoid the SDK driver competing for the same CDC interface.
-# pico_enable_stdio_usb(dinkii-neotrellis-iii 0)
 
-# Route debug printf to UART instead (or disable entirely by leaving both 0).
-# pico_enable_stdio_uart(dinkii-neotrellis-iii 0)
+pico_enable_stdio_usb(dinkii-neotrellis-iii 0)
+pico_enable_stdio_uart(dinkii-neotrellis-iii 0)
 
 # Generate UF2 and other binary output formats
 pico_add_extra_outputs(dinkii-neotrellis-iii)
