@@ -56,6 +56,8 @@ add_executable(dinkii-neotrellis-iii
     src/Adafruit_seesaw/seesaw_neopixel.cpp
     src/usb/usb_descriptors.cpp
 
+    src/device_lua.c
+
     ${CMAKE_SOURCE_DIR}/src/iii/flash.c
     ${CMAKE_SOURCE_DIR}/src/iii/fs.c
     ${CMAKE_SOURCE_DIR}/src/iii/iii.c

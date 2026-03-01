@@ -6,8 +6,6 @@
  *    mode 0 (iii)    - Lua scripting via iii
  *    mode 1 (monome) - standard monome serial protocol
  *
- *  Hold any grid key during boot to toggle between modes.
- *  In mode 1→0 transition, continue holding (~2.5 s) to skip init.lua.
  *
  */
 
