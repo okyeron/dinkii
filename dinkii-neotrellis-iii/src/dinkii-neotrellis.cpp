@@ -71,37 +71,9 @@ int main() {
 
     bool run_script = true;
 
-    // Set USB descriptor before tusb_init() so enumeration uses correct IDs:
-    //   mode 0 (iii)    → DINKII USB  (needs CDC for REPL)
-    //   mode 1 (monome) → MONOME USB  (monome VID/PID for host compatibility)
-    // g_monome_mode = mode;
-
     SetupBoard();
     device_init(); // NeoTrellis hardware init — slow I2C, must finish before USB starts
-    tusb_init();   // enable USB pull-up only after blocking init is done
-
-
-    // bool reset = check_device_key(); // true if a grid key is held at boot
-    // mode = flash_read_mode();
-
-    // if (reset) {
-    //     if (mode == 1) {
-    //         // monome → iii
-    //         flash_write_mode(0);
-    //         mode = 0;
-    //         // Keep holding to skip init.lua (useful for recovery)
-    //         uint16_t count = 0;
-    //         while (check_device_key() && count < 256) {
-    //             sleep_ms(10);
-    //             count++;
-    //         }
-    //         if (count >= 256) run_script = false;
-    //     } else {
-    //         // iii → monome
-    //         flash_write_mode(1);
-    //         mode = 1;
-    //     }
-    // }
+    tusb_init();   // enable USB
 
 
     // Start core 1 as a multicore lockout victim before any LFS flash
@@ -109,6 +81,12 @@ int main() {
     // else; we wait for it to signal that its lockout handler is registered.
     multicore_launch_core1(core1_entry);
     multicore_fifo_pop_blocking(); // wait until core 1 handler is ready
+
+
+    // reset USB descriptor
+    //   mode 0 (iii)    → DINKII USB  (needs CDC for REPL)
+    //   mode 1 (monome) → MONOME USB  (monome VID/PID for host compatibility)
+    // g_monome_mode = mode;
 
     if (mode == 0) {
         gpio_put(LED_PIN2, 1);  // blue

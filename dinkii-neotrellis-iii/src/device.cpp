@@ -21,6 +21,7 @@ extern "C" {
 #include "device_ext.h"
 #include "serial.h"
 #include "util.h"
+#include "flash.h"
 }
 
 #include "config.h"
@@ -138,6 +139,16 @@ static TrellisCallback keyCallback(keyEvent evt) {
     }
     return 0;
 }
+static TrellisCallback keyCheck(keyEvent evt) {
+    uint8_t x = evt.bit.NUM % NUM_COLS;
+    uint8_t y = evt.bit.NUM / NUM_COLS;
+    uint8_t z = (evt.bit.EDGE == SEESAW_KEYPAD_EDGE_RISING) ? 1 : 0;
+    if (x == 0 && y == 0 && z == 1) {
+        mode = 1; // (mode == 0) ? 1 : 0;
+    }
+    return 0;
+}
+
 
 // ---------------------------------------------------------------------------
 // device.h implementations (extern "C" so C code in iii can link against them)
@@ -151,15 +162,45 @@ static uint8_t first_tile_addr() {
 #endif
 }
 
-extern "C" bool check_device_key() {
-    trellis_array[0][0].begin(first_tile_addr());
-    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0),
-                                       SEESAW_KEYPAD_EDGE_FALLING, true);
+extern "C" void check_device_key() {
+    // EDGE_HIGH is a level trigger: fires each seesaw scan while the key is
+    // held, so it works even if the key was already pressed before boot.
+    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, true);
+
     for (int i = 0; i < 50; i++) {
         sleep_ms(10);
-        if (trellis_array[0][0].getKeypadCount() > 0) return true;
+        uint8_t count = trellis_array[0][0].getKeypadCount();
+        sleep_us(500);
+        if (count > 0) {
+            keyEventRaw e[count];
+            trellis_array[0][0].readKeypad(e, count);
+            for (int j = 0; j < count; j++) {
+                uint8_t key = NEO_TRELLIS_SEESAW_KEY(e[j].bit.NUM);
+                if (key == 0 && e[j].bit.EDGE == SEESAW_KEYPAD_EDGE_HIGH) {
+                    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, false);
+                    mode = (mode == 0) ? 1 : 0;
+                    return;
+                }
+            }
+        }
     }
-    return false;
+
+    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, false);
+}
+
+extern "C" void reset_device_key() {
+    trellis.registerCallback(0, 0, keyCallback);
+}
+extern "C" void mode_check() {
+    uint8_t saved = flash_read_mode();
+    mode = saved;
+    // trellis.registerCallback(0, 0, keyCheck);
+
+    check_device_key();   // polls 500 ms; keyCheck toggles mode if key 0,0 pressed
+    
+    if (mode != saved) {
+        flash_write_mode(mode);
+    }
 }
 
 extern "C" void device_init() {
@@ -172,12 +213,13 @@ extern "C" void device_init() {
             trellis.registerCallback(x, y, keyCallback);
         }
     }
-
     for (uint8_t x = 0; x < NUM_COLS / 4; x++) {
         for (uint8_t y = 0; y < NUM_ROWS / 4; y++) {
             trellis_array[y][x].pixels.setBrightness(BRIGHTNESS);
         }
     }
+
+    // reset_device_key();   // restore normal key callback
 
     memset(local_leds,   0, sizeof(local_leds));
     memset(mmap,         0, sizeof(mmap));
@@ -186,11 +228,14 @@ extern "C" void device_init() {
 
     gpio_put(LED_PIN, 0);
 
+    mode_check();
+
     trellis.setPixelColor(0, 0xFFFFFF);
     trellis.show();
     sleep_ms(100);
     trellis.setPixelColor(0, 0x000000);
     trellis.show();
+    
 }
 
 extern "C" void device_task() {

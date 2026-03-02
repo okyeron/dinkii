@@ -70,7 +70,7 @@ add_executable(dinkii-neotrellis-iii
     ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.c
 )
 
-# Build defines — mirrors -DUSE_TINYUSB from platformio.ini
+# Build defines
 target_compile_definitions(dinkii-neotrellis-iii PRIVATE
     LUA_COMPAT_5_2
     LUA_USE_C89
