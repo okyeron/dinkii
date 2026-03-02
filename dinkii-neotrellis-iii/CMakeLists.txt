@@ -75,6 +75,8 @@ target_compile_definitions(dinkii-neotrellis-iii PRIVATE
     LUA_COMPAT_5_2
     LUA_USE_C89
     USE_TINYUSB=1
+    GRIDCOUNT=3   # 1=4X4, 2=8x8, 3=16x8, 4=16x16   
+
 )
 # # Force-include the Lua 5.4↔5.5 compatibility shim for iii's vm.c only.
 # # vm.c calls lua_newstate(f,ud,seed) and luaL_makeseed(L) which are Lua 5.5 APIs.

@@ -17,6 +17,7 @@
 #if GRIDCOUNT == SIXTEEN
 #define NUM_ROWS 4 // down - rows
 #define NUM_COLS 4 // across - columns
+static const uint8_t addrRowOne[1] = {0x2F}; 
 #endif
 #if GRIDCOUNT == SIXTYFOUR
 #define NUM_ROWS 8 // down - rows
@@ -27,9 +28,8 @@ static const uint8_t addrRowTwo[2] = {0x3E,0x36};
 #if GRIDCOUNT == ONETWENTEIGHT
 #define NUM_ROWS 8  // down - rows
 #define NUM_COLS 16 // across - columns
-// denki-oto mecha-layout
-static const uint8_t addrRowOne[4] = {0x3E,0x36,0x2F,0x2E}; 
-static const uint8_t addrRowTwo[4] = {0x33,0x31,0x32,0x30}; 
+const uint8_t addrRowOne[4] = {0x32,0x30,0x2F,0x2E}; 
+const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36}; 
 #endif
 #if GRIDCOUNT == TWOFIFTYSIX
 #define NUM_ROWS 16 // down - rows
