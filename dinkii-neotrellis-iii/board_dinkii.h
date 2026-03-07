@@ -9,10 +9,10 @@
 //       SHOULD ONLY CONSIST OF PREPROCESSOR DIRECTIVES
 // -----------------------------------------------------
 
-// This header may be included by other board headers as "boards/pico.h"
+// This header may be included by other board headers as "board_dinkii.h"
 
-#ifndef _BOARDS_PICO_H
-#define _BOARDS_PICO_H
+#ifndef _BOARD_DINKII_H
+#define _BOARD_DINKII_H
 
 #define PICO_DIVIDER_IN_RAM 1
 #define PICO_PRINTF_NONE

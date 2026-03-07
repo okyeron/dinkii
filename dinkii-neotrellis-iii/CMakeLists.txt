@@ -15,6 +15,8 @@ endif()
 cmake_minimum_required(VERSION 3.13)
 
 # Pull in the Pico SDK (must be before project())
+set(PICO_BOARD board_dinkii CACHE STRING "Board type")
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR} CACHE STRING "Additional board header directories")
 include(pico_sdk_import.cmake)
 
 project(dinkii-neotrellis-iii C CXX ASM)
@@ -23,8 +25,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Export compile commands for IDE IntelliSense (clangd / VS Code)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-set(PICO_BOARD pico CACHE STRING "Board type")
 
 # Initialize the Pico SDK
 pico_sdk_init()
