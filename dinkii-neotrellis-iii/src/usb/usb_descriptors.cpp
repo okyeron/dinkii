@@ -26,7 +26,7 @@
 #include "tusb.h"
 #include <pico/unique_id.h>
 
-#define USB_VID   0xCafe
+#define USB_VID   0xCAFE
 #define USB_BCD   0x0200
 
 static char serial_str[16];
@@ -108,22 +108,21 @@ tusb_desc_device_t const desc_devices[2] =
 
   ////MONOME
     {.bLength = sizeof(tusb_desc_device_t),
-    .bDescriptorType = TUSB_DESC_DEVICE,
-    .bcdUSB = 0x0200,
-    .bDeviceClass = TUSB_CLASS_MISC,
-    .bDeviceSubClass = MISC_SUBCLASS_COMMON,
-    .bDeviceProtocol = MISC_PROTOCOL_IAD,
-    .bMaxPacketSize0 = CFG_TUD_ENDPOINT0_SIZE,
+    .bDescriptorType  = TUSB_DESC_DEVICE,
+    .bcdUSB           = 0x0200,
+    .bDeviceClass     = TUSB_CLASS_CDC,
+    .bDeviceSubClass  = 0,
+    .bDeviceProtocol  = 0,
+    .bMaxPacketSize0  = CFG_TUD_ENDPOINT0_SIZE,
 
-    .idVendor = USB_VID,
-    .idProduct = USB_PID+1,
-    .bcdDevice = 0x0100,
-
-    .iManufacturer = STRING_MANUFACTURER_MONOME,
-    .iProduct = STRING_PRODUCT_MONOME,
-    .iSerialNumber = STRING_SERIAL,
-
-    .bNumConfigurations = 0x01}
+    .idVendor         = USB_VID,
+    .idProduct        = 0x1110,
+    .bcdDevice        = 0x0100,
+    .iManufacturer    = STRING_MANUFACTURER_MONOME,
+    .iProduct         = STRING_PRODUCT_MONOME,
+    .iSerialNumber    = STRING_SERIAL,
+    .bNumConfigurations = 0x01
+  }
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
@@ -145,7 +144,7 @@ enum
 };
 
 // #define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_MIDI_DESC_LEN)
-// #define CONFIG_TOTAL_LEN_CDC  (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN_CDC  (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
 #define CONFIG_TOTAL_LEN_MIDI  (TUD_CONFIG_DESC_LEN + TUD_MIDI_DESC_LEN + TUD_CDC_DESC_LEN)
 
 #if CFG_TUSB_MCU == OPT_MCU_LPC175X_6X || CFG_TUSB_MCU == OPT_MCU_LPC177X_8X || CFG_TUSB_MCU == OPT_MCU_LPC40XX
@@ -164,11 +163,11 @@ enum
   #define EPNUM_CDC_IN      0x82
   
 
-  #define EPNUM_MIDI_OUT   0x04
-  #define EPNUM_MIDI_IN   0x84
+  #define EPNUM_MIDI_OUT   0x05
+  #define EPNUM_MIDI_IN   0x85
 #endif
 
-uint8_t const desc_fs_configuration[] =
+uint8_t const desc_fs_configuration_0[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
   TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, STRING_LANGID, CONFIG_TOTAL_LEN_MIDI, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
@@ -180,17 +179,15 @@ uint8_t const desc_fs_configuration[] =
   TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, EPNUM_MIDI_IN, 64)
   // TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, (0x80 | EPNUM_MIDI_IN), 64)
 };
-
-#if TUD_OPT_HIGH_SPEED
-uint8_t const desc_hs_configuration[] =
+uint8_t const desc_fs_configuration_1[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_CDC_DATA + 1 , STRING_LANGID, CONFIG_TOTAL_LEN_CDC, 0x00, 100),
 
-  // Interface number, string index, EP Out & EP In address, EP size
-  TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, 0, EPNUM_MIDI_OUT, (0x80 | EPNUM_MIDI_IN), 512)
+  // 1st CDC: Interface number, string index, EP notification address and size, EP data address (out, in) and size.
+  TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, STRING_CDC, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
 };
-#endif
+
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
@@ -198,13 +195,7 @@ uint8_t const desc_hs_configuration[] =
 uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 {
   (void) index; // for multiple configurations
-
-#if TUD_OPT_HIGH_SPEED
-  // Although we are highspeed, host may be fullspeed.
-  return (tud_speed_get() == TUSB_SPEED_HIGH) ?  desc_hs_configuration : desc_fs_configuration;
-#else
-  return desc_fs_configuration;
-#endif
+  return g_monome_mode == 0 ? desc_fs_configuration_0 : desc_fs_configuration_1;
 }
 
 //--------------------------------------------------------------------+

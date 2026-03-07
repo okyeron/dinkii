@@ -40,6 +40,7 @@ void MonomeSerialDevice::setupAsArc(uint8_t _encoders) {
 void MonomeSerialDevice::getDeviceInfo() {
     //debugln(INFO, "MonomeSerialDevice::getDeviceInfo");
     tud_cdc_write_char(uint8_t(0));
+    tud_cdc_n_write_flush(0);
  }
 
 void MonomeSerialDevice::poll() {
@@ -239,6 +240,7 @@ void MonomeSerialDevice::processSerial() {
             tud_cdc_write_char((uint8_t)0x00); // send again with 2 = key-grid
             tud_cdc_write_char((uint8_t)0x02); // 
             tud_cdc_write_char((uint8_t)numQuads); 
+            tud_cdc_n_write_flush(0);
 
             break;
 
@@ -251,6 +253,7 @@ void MonomeSerialDevice::processSerial() {
                   tud_cdc_write_char((uint8_t)0x00);
                 }
             }
+            tud_cdc_n_write_flush(0);
             break;
 
         case 0x02:  // system / write ID
@@ -259,6 +262,7 @@ void MonomeSerialDevice::processSerial() {
             for (int i = 0; i < 32; i++) {  // has to be 32
                 deviceID += (char)tud_cdc_read_char();
             }
+            tud_cdc_n_write_flush(0);
             break;
 
         case 0x03:  // system / report grid offset
@@ -267,6 +271,7 @@ void MonomeSerialDevice::processSerial() {
             tud_cdc_write_char((uint8_t)0x01);
             tud_cdc_write_char((uint8_t)0);     // x offset - could be 0 or 8  ### NEEDS grid size variable
             tud_cdc_write_char((uint8_t)0);     // y offset
+            tud_cdc_n_write_flush(0);
             break;
 
         case 0x04:  // system / report ADDR
@@ -281,6 +286,7 @@ void MonomeSerialDevice::processSerial() {
             tud_cdc_write_char((uint8_t)0x03);             // system / request grid size
             tud_cdc_write_char((uint8_t)gridX);                // gridX
             tud_cdc_write_char((uint8_t)gridY);                // gridY
+            tud_cdc_n_write_flush(0);
             break;
 
         case 0x06:
@@ -758,6 +764,7 @@ void MonomeEventQueue::sendArcDelta(uint8_t index, int8_t delta) {
     tud_cdc_write_char((uint8_t)0x50);
     tud_cdc_write_char((uint8_t)index);
     tud_cdc_write_char((int8_t)delta);
+    tud_cdc_n_write_flush(0);
  
     /*
     byte buf[3];
@@ -784,6 +791,7 @@ void MonomeEventQueue::sendArcKey(uint8_t index, uint8_t pressed) {
     buf[1] = index;
     tud_cdc_write_char(buf[0]);
     tud_cdc_write_char(buf[1]);
+    tud_cdc_n_write_flush(0);
 }
 
 void MonomeEventQueue::sendGridKey(uint8_t x, uint8_t y, uint8_t pressed) {    
@@ -796,6 +804,7 @@ void MonomeEventQueue::sendGridKey(uint8_t x, uint8_t y, uint8_t pressed) {
     tud_cdc_write_char((uint8_t)buf[0]);
     tud_cdc_write_char((uint8_t)x);
     tud_cdc_write_char((uint8_t)y);
+    tud_cdc_n_write_flush(0);
 }
 
 void MonomeEventQueue::sendTiltEvent(uint8_t n,int8_t xh,int8_t xl,int8_t yh,int8_t yl,int8_t zh,int8_t zl)
@@ -808,4 +817,5 @@ void MonomeEventQueue::sendTiltEvent(uint8_t n,int8_t xh,int8_t xl,int8_t yh,int
     tud_cdc_write_char((int8_t)yl);
     tud_cdc_write_char((int8_t)zh);
     tud_cdc_write_char((int8_t)zl);
+    tud_cdc_n_write_flush(0);
  }

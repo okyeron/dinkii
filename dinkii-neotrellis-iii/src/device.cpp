@@ -15,6 +15,11 @@
 #include "MonomeSerialDevice.h"
 #include "Adafruit_seesaw/Adafruit_NeoTrellis.h"
 
+#include "config.h"
+#include "pico/stdlib.h"
+#include "tusb.h"
+#include <string.h>
+
 // C headers from iii — wrap in extern "C" so C++ sees them with C linkage
 extern "C" {
 #include "device.h"
@@ -24,15 +29,11 @@ extern "C" {
 #include "flash.h"
 }
 
-#include "config.h"
-#include "pico/stdlib.h"
-#include "tusb.h"
-#include <string.h>
-
 // ---------------------------------------------------------------------------
 // mode — defined in dinkii-neotrellis.cpp, set before device_init() is called
 // ---------------------------------------------------------------------------
 extern uint8_t mode;
+extern uint8_t g_monome_mode;
 
 // ---------------------------------------------------------------------------
 // NeoTrellis objects
@@ -128,6 +129,14 @@ static void sendLeds_monome() {
 // NeoTrellis key callback — dispatches based on current mode
 // ---------------------------------------------------------------------------
 static TrellisCallback keyCallback(keyEvent evt) {
+    // Only process RISING and FALLING edges. EDGE_HIGH (0) and EDGE_LOW (1)
+    // are never enabled in normal operation; 0x00 garbage bytes from the
+    // library's "count+2" over-read decode to EDGE_HIGH for key 0, causing
+    // phantom key-up events.
+    if (evt.bit.EDGE != SEESAW_KEYPAD_EDGE_RISING &&
+        evt.bit.EDGE != SEESAW_KEYPAD_EDGE_FALLING)
+        return 0;
+
     uint8_t x = evt.bit.NUM % NUM_COLS;
     uint8_t y = evt.bit.NUM / NUM_COLS;
     uint8_t z = (evt.bit.EDGE == SEESAW_KEYPAD_EDGE_RISING) ? 1 : 0;
@@ -167,7 +176,8 @@ extern "C" void check_device_key() {
     // held, so it works even if the key was already pressed before boot.
     trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, true);
 
-    for (int i = 0; i < 50; i++) {
+    bool detected = false;
+    for (int i = 0; i < 50 && !detected; i++) {
         sleep_ms(10);
         uint8_t count = trellis_array[0][0].getKeypadCount();
         sleep_us(500);
@@ -177,29 +187,39 @@ extern "C" void check_device_key() {
             for (int j = 0; j < count; j++) {
                 uint8_t key = NEO_TRELLIS_SEESAW_KEY(e[j].bit.NUM);
                 if (key == 0 && e[j].bit.EDGE == SEESAW_KEYPAD_EDGE_HIGH) {
-                    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, false);
                     mode = (mode == 0) ? 1 : 0;
-                    return;
+                    detected = true;
+                    break;
                 }
             }
         }
     }
 
+    // Disable HIGH, restore RISING/FALLING for normal key operation.
     trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, false);
+    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_RISING, true);
+    trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_FALLING, true);
+    // Drain stale EDGE_HIGH events left in the FIFO so they don't get
+    // processed as phantom key-up events by the first device_task() calls.
+    uint8_t stale = trellis_array[0][0].getKeypadCount();
+    sleep_us(500);
+    if (stale > 0) {
+        keyEventRaw tmp[stale + 2];
+        trellis_array[0][0].readKeypad(tmp, stale + 2);
+    }
 }
 
-extern "C" void reset_device_key() {
-    trellis.registerCallback(0, 0, keyCallback);
-}
+
 extern "C" void mode_check() {
     uint8_t saved = flash_read_mode();
     mode = saved;
-    // trellis.registerCallback(0, 0, keyCheck);
+    
 
     check_device_key();   // polls 500 ms; keyCheck toggles mode if key 0,0 pressed
     
     if (mode != saved) {
         flash_write_mode(mode);
+        g_monome_mode = mode;
     }
 }
 
@@ -218,8 +238,6 @@ extern "C" void device_init() {
             trellis_array[y][x].pixels.setBrightness(BRIGHTNESS);
         }
     }
-
-    // reset_device_key();   // restore normal key callback
 
     memset(local_leds,   0, sizeof(local_leds));
     memset(mmap,         0, sizeof(mmap));
