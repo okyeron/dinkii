@@ -59,6 +59,7 @@ enum {
   STRING_VENDOR,
   STRING_MANUFACTURER_MONOME,
   STRING_PRODUCT_MONOME,
+  STRING_SERIAL_MONOME,
   STRING_LAST,
 };
 
@@ -100,9 +101,9 @@ tusb_desc_device_t const desc_devices[2] =
     .idProduct          = 0x1101,
     .bcdDevice          = 0x0100,
 
-    .iManufacturer = STRING_MANUFACTURER,
-    .iProduct = STRING_PRODUCT,
-    .iSerialNumber = STRING_SERIAL,
+    .iManufacturer      = STRING_MANUFACTURER,
+    .iProduct           = STRING_PRODUCT,
+    .iSerialNumber      = STRING_SERIAL,
 
     .bNumConfigurations = 0x01},
 
@@ -120,7 +121,7 @@ tusb_desc_device_t const desc_devices[2] =
     .bcdDevice        = 0x0100,
     .iManufacturer    = STRING_MANUFACTURER_MONOME,
     .iProduct         = STRING_PRODUCT_MONOME,
-    .iSerialNumber    = STRING_SERIAL,
+    .iSerialNumber    = STRING_SERIAL_MONOME,
     .bNumConfigurations = 0x01
   }
 };
@@ -205,11 +206,25 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 
 static uint16_t _desc_str[32 + 1];
 
+static uint8_t fill_serial_str(const char *fmt) {
+  pico_unique_board_id_t id;
+  pico_get_unique_board_id(&id);
+  uint64_t idx;
+  memcpy(&idx, id.id, sizeof(idx));
+  int serialnum = (int)((idx + 1) % 10000000ull);
+  if (serialnum < 1000000)
+    serialnum += 1000000; // ensure 7 digits
+  char temp[16];
+  uint8_t chr_count = (uint8_t)snprintf(temp, sizeof(temp), fmt, serialnum);
+  for (uint8_t i = 0; i < chr_count; i++)
+    _desc_str[1 + i] = temp[i];
+  return chr_count;
+}
+
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-// Invoked to return string descriptors
 
-uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) 
+uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
   (void)langid;
   uint8_t chr_count;
@@ -217,18 +232,10 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
   if (index == 0) {
     memcpy(&_desc_str[1], string_desc_arr[0], 2);
     chr_count = 1;
+  } else if (index == STRING_SERIAL_MONOME) {
+    chr_count = fill_serial_str("m%07d");
   } else if (index == STRING_SERIAL) {
-    pico_unique_board_id_t id;
-    pico_get_unique_board_id(&id);
-    uint64_t idx = *(uint64_t *)&id.id;
-    int serialnum = ((idx + 1) % 10000000ull);
-    if (serialnum < 1000000)
-      serialnum += 1000000; // 7 digits
-    char temp[16];
-    chr_count = sprintf(temp, "m%07d", serialnum);
-    for (uint8_t i = 0; i < chr_count; i++) {
-      _desc_str[1 + i] = temp[i];
-    }
+    chr_count = fill_serial_str("%07d");
   } else if (index < STRING_LAST) {
     const char *str = string_desc_arr[index];
     chr_count = strlen(str);
