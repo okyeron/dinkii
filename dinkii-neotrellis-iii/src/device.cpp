@@ -171,7 +171,7 @@ static uint8_t first_tile_addr() {
 #endif
 }
 
-extern "C" void check_device_key() {
+extern "C" bool check_device_key() {
     // EDGE_HIGH is a level trigger: fires each seesaw scan while the key is
     // held, so it works even if the key was already pressed before boot.
     trellis_array[0][0].setKeypadEvent(NEO_TRELLIS_KEY(0), SEESAW_KEYPAD_EDGE_HIGH, true);
@@ -207,6 +207,7 @@ extern "C" void check_device_key() {
         keyEventRaw tmp[stale + 2];
         trellis_array[0][0].readKeypad(tmp, stale + 2);
     }
+    return detected;
 }
 
 
