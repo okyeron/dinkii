@@ -16,6 +16,7 @@
 #include "Adafruit_seesaw/Adafruit_NeoTrellis.h"
 
 #include "config.h"
+#include "pico/time.h"
 #include "pico/stdlib.h"
 #include "tusb.h"
 #include <string.h>
@@ -258,15 +259,10 @@ extern "C" void device_init() {
 }
 
 extern "C" void device_task() {
-    static uint32_t last_refresh = 0;
-    uint32_t now = to_ms_since_boot(get_absolute_time());
-    if (now - last_refresh < 16) return;
-    last_refresh = now;
-
     trellis.read();
 
-    static uint8_t ewr = 0;
-    if (grid_event_count > 0) {
+    uint8_t ewr = 0;
+    while (grid_event_count > 0) {
         vm_handle_grid_key(grid_events[ewr].x, grid_events[ewr].y, grid_events[ewr].z);
         ewr++;
         if (ewr == grid_event_count) {
