@@ -84,6 +84,14 @@ target_compile_definitions(dinkii-neotrellis-iii PRIVATE
 #     COMPILE_OPTIONS "-include;${CMAKE_CURRENT_SOURCE_DIR}/src/iii_lua_compat.h"
 # )
 
+# vm.c uses lua_pushinteger/lua_tointeger but is compiled with LUA_USE_C89,
+# which makes lua_Integer = long (32-bit). The Lua library is compiled without
+# LUA_USE_C89 so lua_Integer = long long (64-bit). On ARM AAPCS this causes an
+# ABI mismatch: lua_pushinteger expects long long in r2:r3 but the caller puts
+# long in r1, pushing garbage values. Undefine LUA_USE_C89 for vm.c only.
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/iii/vm.c PROPERTIES
+    COMPILE_OPTIONS "-ULUA_USE_C89"
+)
 
 # Include directories (headers live at the project root)
 target_include_directories(dinkii-neotrellis-iii PUBLIC
