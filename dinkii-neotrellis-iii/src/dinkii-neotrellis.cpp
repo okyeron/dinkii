@@ -72,8 +72,15 @@ int main() {
     bool run_script = true;
 
     SetupBoard();
-    device_init(); // NeoTrellis hardware init — slow I2C, must finish before USB starts
+    device_init(); // NeoTrellis hardware init
     tusb_init();   // enable USB
+
+    // Give USB time to stabilize
+    sleep_ms(500);
+    for (int i = 0; i < 50; i++) {
+        tud_task();
+        sleep_ms(10);
+    }
 
 
     // Start core 1 as a multicore lockout victim before any LFS flash
