@@ -88,7 +88,7 @@ extern uint8_t g_monome_mode;
 // Device Descriptors
 //--------------------------------------------------------------------+
 tusb_desc_device_t const desc_devices[2] = 
-{ ////DINKII
+{ ////DINK-III
     {.bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
     .bcdUSB             = 0x0200,
