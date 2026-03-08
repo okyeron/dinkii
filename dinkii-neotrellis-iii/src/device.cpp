@@ -51,7 +51,7 @@ Adafruit_NeoTrellis trellis_array[NUM_ROWS / 4][NUM_COLS / 4] = {
     {Adafruit_NeoTrellis(addrRowTwo[0]), Adafruit_NeoTrellis(addrRowTwo[1])}};
 #endif
 
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
 Adafruit_NeoTrellis trellis_array[NUM_ROWS / 4][NUM_COLS / 4] = {
     {Adafruit_NeoTrellis(addrRowOne[0]), Adafruit_NeoTrellis(addrRowOne[1]),
      Adafruit_NeoTrellis(addrRowOne[2]), Adafruit_NeoTrellis(addrRowOne[3])},
@@ -165,7 +165,7 @@ static TrellisCallback keyCheck(keyEvent evt) {
 // ---------------------------------------------------------------------------
 
 static uint8_t first_tile_addr() {
-#if GRIDCOUNT == SIXTYFOUR || GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == SIXTYFOUR || GRIDCOUNT == ONETWENTYEIGHT
     return addrRowOne[0];
 #else
     return NEO_TRELLIS_ADDR;

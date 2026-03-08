@@ -6,10 +6,10 @@
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
+#define ONETWENTYEIGHT 3
 #define TWOFIFTYSIX 4
 
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
+// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTYEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
 #define GRIDCOUNT SIXTYFOUR
 #endif
@@ -25,7 +25,7 @@ static const uint8_t addrRowOne[1] = {0x2F};
 static const uint8_t addrRowOne[2] = {0x2F,0x2E}; 
 static const uint8_t addrRowTwo[2] = {0x3E,0x36}; 
 #endif
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
 #define NUM_ROWS 8  // down - rows
 #define NUM_COLS 16 // across - columns
 const uint8_t addrRowOne[4] = {0x32,0x30,0x2F,0x2E}; 
