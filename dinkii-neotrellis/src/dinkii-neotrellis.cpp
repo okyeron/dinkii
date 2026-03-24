@@ -69,7 +69,7 @@ int prevLedBuffer[mdp.MAXLEDCOUNT];
   };
 #endif
 
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
   // 16x8
   Adafruit_NeoTrellis trellis_array[NUM_ROWS / 4][NUM_COLS / 4] = {
     { Adafruit_NeoTrellis(addrRowOne[0], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[1], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[2], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[3], &MYWIRE)}, // top row

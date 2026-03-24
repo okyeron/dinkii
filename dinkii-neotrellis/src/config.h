@@ -5,12 +5,12 @@
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
+#define ONETWENTYEIGHT 3
 #define TWOFIFTYSIX 4
 
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
+// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTYEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
-#define GRIDCOUNT SIXTEEN
+#define GRIDCOUNT ONETWENTYEIGHT
 #endif
 
 #if GRIDCOUNT == SIXTEEN
@@ -21,7 +21,7 @@
   #define NUM_ROWS 8 // down - rows 
   #define NUM_COLS 8 // across - columns
 #endif
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
   #define NUM_ROWS 8 // down - rows 
   #define NUM_COLS 16 // across - columns
 #endif
