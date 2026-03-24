@@ -2,6 +2,8 @@
 #include "pico/stdlib.h"
 #include <stdint.h>
 
+#define DEVICE_VERSION "1.1.0"
+
 #define TEST 0 // SET TO 1 for testing
 
 #define SIXTEEN 1
