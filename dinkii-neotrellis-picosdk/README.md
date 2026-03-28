@@ -1,6 +1,6 @@
-# dink-ii neotrellis grid + iii
+# dink-ii neotrellis grid - PicoSDK edition
 
-This version is rewritten to use the Raspberry Pi PicoSDK and the Raspberry Pi Pico VS Code Extension. It also includes the [monome iii scripting](https://monome.org/docs/iii/) mode.  
+This version is rewritten to use the Raspberry Pi PicoSDK and the Raspberry Pi Pico VS Code Extension. 
 
 To get your environment setup in VSCode, first install the Raspberry Pi Pico VSCode Extension from the Extensions tab in VSCode.  
 
@@ -110,19 +110,3 @@ For example, to use a green-tinted color:
 ```
 
 `BRIGHTNESS` caps the overall output — useful if NeoPixels are too bright when powered over USB. `gammaAdj` can be set to `2` to boost perceived brightness at lower levels.
-
-### iii  
-
-iii is an interactive scripting environment that runs on the device itself.  With grid, this can turn the device into a user-scriptable midi controller/sequencer.  
-
-See https://github.com/monome/iii for documentation.  
-
-The `diii` REPL tool is hosted at https://monome.org/diii  
-
-The neotrellis build includes a custom lua function to change the entire grid color (but not individual pixel colors). 
-
-You can use this in scripts as follows. The if statement is there to avoid errors on regular iii devices.  
-
-```if grid_color then grid_color(250,80,10) end```
-
-Please don't bother monome or the lines forum with regards to this particular feature.  
