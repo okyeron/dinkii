@@ -2,7 +2,7 @@
 #include "pico/stdlib.h"
 #include <stdint.h>
 
-#define DEVICE_VERSION "1.1.0"
+#define DEVICE_VERSION "v260324"
 
 #define TEST 0 // SET TO 1 for testing
 
@@ -63,13 +63,23 @@ const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36};
 #define G 255
 #define B 255
 
+// Seafoam / Mint Green
+// #define R 73
+// #define G 214
+// #define B 148
+
+// Warm Orange
+// #define R 250
+// #define G 80
+// #define B 10
+
 // gamma table for 16 levels of brightness
 static const uint8_t gammaTable[16] = {0,  2,  3,  6,  11, 18,  25,  32,
                                        41, 59, 70, 80, 92, 103, 115, 127};
-static const uint8_t gammaAdj = 1; // from 1 to 2
+static const uint8_t gammaAdj = 1; // multiply gamma output by 1 or 2
 
-// set your monome device name here
 static const char* deviceID = "monome";
+/* -- NOT USED
 static const char* serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB
@@ -77,6 +87,7 @@ static const char* serialNum = "m4216126";
 static char mfgstr[32] = "monome";
 static char prodstr[32] = "grid";
 static char serialstr[32] = "m4216126";
+*/
 
 #define mapRange(s,a1,a2,b1,b2) (b1 + (s-a1)*(b2-b1)/(a2-a1))
 

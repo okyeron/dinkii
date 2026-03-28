@@ -32,12 +32,14 @@ pico_sdk_init()
 #------------------------------------------------------------------------
 #--- embedded lua to c include
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 add_custom_command(
         OUTPUT
             ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.h
             ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.c
         COMMAND
-            python3 ${CMAKE_SOURCE_DIR}/src/tools/embed.py ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua ${CMAKE_SOURCE_DIR}/src/iii/resource
+            ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/src/tools/embed.py ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua ${CMAKE_SOURCE_DIR}/src/iii/resource
         DEPENDS
             ${CMAKE_SOURCE_DIR}/src/iii/lua/lib.lua
 )
@@ -69,6 +71,8 @@ add_executable(dinkii-neotrellis-iii
     ${CMAKE_SOURCE_DIR}/src/iii/vm.c
     ${CMAKE_SOURCE_DIR}/src/iii/resource/lib_lua.c
 )
+
+# UPDATE HERE FOR YOUR BUILD
 
 # Build defines
 target_compile_definitions(dinkii-neotrellis-iii PRIVATE

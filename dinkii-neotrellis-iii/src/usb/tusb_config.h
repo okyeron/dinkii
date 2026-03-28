@@ -72,6 +72,8 @@ extern "C" {
 // DEVICE CONFIGURATION
 //--------------------------------------------------------------------
 
+#define BOARD_TUD_RHPORT      0
+
 #ifndef CFG_TUD_ENDPOINT0_SIZE
 #define CFG_TUD_ENDPOINT0_SIZE    64
 #endif

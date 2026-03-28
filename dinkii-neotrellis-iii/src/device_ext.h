@@ -15,6 +15,7 @@ extern void device_intensity(int z);
 extern void device_mark_dirty(void);
 extern int  device_cols(void);
 extern int  device_rows(void);
+extern void device_color_set(int r, int g, int b);
 
 // Defined in device_lua.c; called from device_task() in device.cpp.
 extern void vm_handle_grid_key(uint8_t x, uint8_t y, uint8_t z);

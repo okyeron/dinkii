@@ -86,8 +86,8 @@ void Adafruit_NeoTrellis::activateKey(uint8_t key, uint8_t edge, bool enable) {
 /**************************************************************************/
 void Adafruit_NeoTrellis::read(bool polling) {
   uint8_t count = getKeypadCount();
-  sleep_us(500);
   if (count > 0) {
+    sleep_us(500);
     if (polling)
       count = count + 2;
     keyEventRaw e[count];
@@ -325,8 +325,8 @@ void Adafruit_MultiTrellis::read() {
       t = (_trelli + n * _cols) + m;
 
       uint8_t count = t->getKeypadCount();
-      sleep_us(500);
       if (count > 0) {
+        sleep_us(500);
         count = count + 2;
         keyEventRaw e[count];
         t->readKeypad(e, count);

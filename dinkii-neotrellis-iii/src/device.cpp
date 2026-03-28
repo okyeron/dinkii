@@ -99,11 +99,15 @@ static void grid_add_event(uint8_t x, uint8_t y, uint8_t z) {
 // LED update helpers
 // ---------------------------------------------------------------------------
 
+static uint8_t led_r = R;
+static uint8_t led_g = G;
+static uint8_t led_b = B;
+
 static inline uint32_t level_to_color(uint8_t val) {
     uint8_t gval = (uint8_t)((uint16_t)gammaTable[val] * gammaAdj);
-    return (((uint32_t)((uint16_t)gval * R) / 256) << 16)
-         | (((uint32_t)((uint16_t)gval * G) / 256) << 8)
-         |  ((uint32_t)((uint16_t)gval * B) / 256);
+    return (((uint32_t)((uint16_t)gval * led_r) / 256) << 16)
+         | (((uint32_t)((uint16_t)gval * led_g) / 256) << 8)
+         |  ((uint32_t)((uint16_t)gval * led_b) / 256);
 }
 
 static void sendLeds_iii() {
@@ -215,8 +219,6 @@ extern "C" bool check_device_key() {
 extern "C" void mode_check() {
     uint8_t saved = flash_read_mode();
     mode = saved;
-    
-
     check_device_key();   // polls 500 ms; keyCheck toggles mode if key 0,0 pressed
     
     if (mode != saved) {
@@ -250,12 +252,24 @@ extern "C" void device_init() {
 
     mode_check();
 
-    trellis.setPixelColor(0, 0xFFFFFF);
-    trellis.show();
-    sleep_ms(100);
-    trellis.setPixelColor(0, 0x000000);
-    trellis.show();
-    
+    if (mode == 0){
+        trellis.setPixelColor(0, 0xFFFFFF);
+        trellis.setPixelColor(7, 0xFFFFFF);
+        trellis.setPixelColor(15, 0xFFFFFF);
+        trellis.show();
+        sleep_ms(100);
+        trellis.setPixelColor(0, 0x000000);
+        trellis.setPixelColor(7, 0x000000);
+        trellis.setPixelColor(15, 0x000000);
+        trellis.show();
+    }else{
+        trellis.setPixelColor(0, 0xFFFFFF);
+        trellis.show();
+        sleep_ms(100);
+        trellis.setPixelColor(0, 0x000000);
+        trellis.show();   
+    }
+
 }
 
 extern "C" void device_task() {
@@ -275,6 +289,7 @@ extern "C" void device_task() {
         sendLeds_iii();
         grid_dirty = false;
     }
+    tud_cdc_n_write_flush(0);
 }
 
 extern "C" void device_handle_serial(uint8_t *data, uint32_t len) {
@@ -331,6 +346,12 @@ extern "C" void device_intensity(int z) {
 extern "C" void device_mark_dirty(void) { grid_dirty = true; }
 extern "C" int  device_cols(void)       { return NUM_COLS; }
 extern "C" int  device_rows(void)       { return NUM_ROWS; }
+extern "C" void device_color_set(int r, int g, int b) {
+    led_r = (uint8_t)r;
+    led_g = (uint8_t)g;
+    led_b = (uint8_t)b;
+    grid_dirty = true;
+}
 
 // ---------------------------------------------------------------------------
 // Device info strings
@@ -352,7 +373,6 @@ extern "C" const char *device_id()       { return "grid"; }
 extern "C" const char *device_str1()     { return "monome"; }
 extern "C" const char *device_str2()     { return (mode == 0) ? "iii grid" : "grid"; }
 extern "C" const char *device_version()  { return DEVICE_VERSION; }
-
 
 // ---------------------------------------------------------------------------
 // Monome mode main loop

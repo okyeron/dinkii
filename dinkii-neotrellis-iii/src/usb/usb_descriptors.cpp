@@ -68,13 +68,13 @@ enum {
 char const* string_desc_arr [] = {
     (const char[]){0x09, 0x04}, // 0: supported language is English (0x0409)
     "monome",                // 1: Manufacturer
-    "iii",                      // 2: Product
-    serial_str,                 // 3: Serial Number
-    "dinkii cdc",               // 4: Serial Port
-    "dinkii midi",              // 5: MIDI
-    "dinkii webusb",            // 6: Vendor
-    "monome",                   // 7: Manufacturer Monome
-    "grid",               // 8: Product Monome
+    "iii",                   // 2: Product
+    serial_str,              // 3: Serial Number
+    "dinkii cdc",            // 4: Serial Port
+    "dinkii midi",           // 5: MIDI
+    "dinkii webusb",         // 6: Vendor
+    "monome",                // 7: Manufacturer Monome
+    "grid",                  // 8: Product Monome
     ""
 };
 
@@ -107,7 +107,7 @@ tusb_desc_device_t const desc_devices[2] =
 
     .bNumConfigurations = 0x01},
 
-  ////MONOME
+    //// MONOME
     {.bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType  = TUSB_DESC_DEVICE,
     .bcdUSB           = 0x0200,
@@ -135,6 +135,10 @@ uint8_t const *tud_descriptor_device_cb(void) { return (uint8_t const *)&desc_de
 // Configuration Descriptor
 //--------------------------------------------------------------------+
 
+// IAD macro for MIDI on Windows (TinyUSB doesn't provide one like it does for CDC)
+#define TUD_MIDI_IAD_DESCRIPTOR(_itfnum, _stridx) \
+  8, TUSB_DESC_INTERFACE_ASSOCIATION, _itfnum, 2, TUSB_CLASS_AUDIO, AUDIO_SUBCLASS_CONTROL, AUDIO_FUNC_PROTOCOL_CODE_UNDEF, _stridx
+
 enum
 {
   ITF_NUM_CDC = 0,
@@ -146,7 +150,7 @@ enum
 
 // #define CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_MIDI_DESC_LEN)
 #define CONFIG_TOTAL_LEN_CDC  (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN)
-#define CONFIG_TOTAL_LEN_MIDI  (TUD_CONFIG_DESC_LEN + TUD_MIDI_DESC_LEN + TUD_CDC_DESC_LEN)
+#define CONFIG_TOTAL_LEN_MIDI  (TUD_CONFIG_DESC_LEN + TUD_MIDI_DESC_LEN + TUD_CDC_DESC_LEN + 8)
 
 #if CFG_TUSB_MCU == OPT_MCU_LPC175X_6X || CFG_TUSB_MCU == OPT_MCU_LPC177X_8X || CFG_TUSB_MCU == OPT_MCU_LPC40XX
   // LPC 17xx and 40xx endpoint type (bulk/interrupt/iso) are fixed by its number
@@ -175,6 +179,9 @@ uint8_t const desc_fs_configuration_0[] =
 
   // 1st CDC: Interface number, string index, EP notification address and size, EP data address (out, in) and size.
   TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, STRING_CDC, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
+
+  // Interface Association Descriptor for MIDI (audio control + MIDI streaming)
+  TUD_MIDI_IAD_DESCRIPTOR(ITF_NUM_MIDI, 0),
 
   // Interface number, string index, EP Out & EP In address, EP size
   TUD_MIDI_DESCRIPTOR(ITF_NUM_MIDI, STRING_MIDI, EPNUM_MIDI_OUT, EPNUM_MIDI_IN, 64)
