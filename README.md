@@ -6,6 +6,13 @@ IMPORTANT - by default dink-ii sends 5v over the STEMMA-QT connector. If you nee
 
 dink-ii uses a standard STEMMA-QT (JST-SH) connector for i2c.
 
+## Code variations
+
+Different builds are available depending your needs. `PlatformIO/Arduino`, `PicoSDK` and also `iii`(which uses the PicoSDK).  
+
+__See the individual directories for a README on each of the different builds.__  
+
+
 ## Dimensions
 
 41.6mm x 20mm 
