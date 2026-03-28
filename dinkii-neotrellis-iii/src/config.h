@@ -56,7 +56,7 @@ const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36};
 // this brightness to a much lower value
 #define BRIGHTNESS                                                             \
   96 // overall grid brightness
-     // may need adjustment for larger grids
+     // may need adjustment for larger grids or connection to lower power devices (phones)
      // use gammaTable and gammaAdj below to adjust levels
 
 #define R 255

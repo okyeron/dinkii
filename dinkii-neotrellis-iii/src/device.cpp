@@ -369,7 +369,7 @@ static const char *device_help_str =
     "  grid_size_y()\n";
 
 extern "C" const char *device_help_txt() { return device_help_str; }
-extern "C" const char *device_id()       { return "grid"; }
+extern "C" const char *device_id()       { return "dinkii-grid"; }
 extern "C" const char *device_str1()     { return "monome"; }
 extern "C" const char *device_str2()     { return (mode == 0) ? "iii grid" : "grid"; }
 extern "C" const char *device_version()  { return DEVICE_VERSION; }
