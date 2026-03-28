@@ -12,7 +12,7 @@ dink-ii uses a standard STEMMA-QT (JST-SH) connector for i2c.
 
 [Board outline file with holes](<dinkii-outline.svg>)
 
-## Programming notes
+## General programming notes
 
 i2c is set to the `i2c1` bus, so use `Wire1` in Arduino. i2c Pins are `SDA = 2` and `SCL = 3`
 

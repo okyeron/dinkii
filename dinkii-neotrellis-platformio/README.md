@@ -1,27 +1,9 @@
 # dink-ii for NeoTrellis/MechaTrellis
 
-dink-ii is an RP2040 based microcontroller designed for plug-n-play use with STEMMA-QT compatible i2c devices.
 
-IMPORTANT - by default dink-ii sends 5v over the STEMMA-QT connector. If you need 3.3v for your device, see the jumper section below. (Note - NeoTrellis and MechaTrellis want 5v)
-
-## Hardware
-
-### NeoTrellis
-
-Requires a JST-PH to JST-SH (same side) connector cable.
-
-### MechaTrellis
-
-Requires a JST-SH to JST-SH (opposite side) connector cable.
-
-### 5v jumper
-
-NeoTrellis and MechaTrellis use 5v so the STEMMA-QT connector defaults to 5v. If you need  3.3v instead for some other project, there is a 3-way jumper on the bottom of the board. For 3.3v, cut the trace between the center pad and the 5v pad, and then re-solder a bridge from the center pad to the 3.3v pad.
-
-dink-ii boards ship with monome grid firmware installed in test mode (see board testing below)
+## Firmware using PlatformIO or Arduino IDE
 
 
-## Firmware
 
 ### How to program/flash the board:
 
@@ -87,8 +69,12 @@ const uint8_t addrRowOne[4] = {0x32,0x30,0x2F,0x2E};
 const uint8_t addrRowTwo[4] = {0x33,0x31,0x3E,0x36}; 
 ```
 
-See board photos below for address jumpers on NeoTrellis and MechaTrellis. 
- 
+See board photos below for address jumpers on NeoTrellis and MechaTrellis.   
+
+![<mechatrellis-addresses>](<../images/mechatrellis-addresses.png>)
+
+![<neotrellis_addresses>](<../images/neotrellis_addresses.jpg>)
+
 
 ### Board testing 
 
@@ -110,6 +96,3 @@ i2c_config should be set to the 8x8 addresses for this test mode.
 #endif
 ```
 
-![<mechatrellis-addresses>](<mechatrellis-addresses.png>)
-
-![<neotrellis_addresses>](<neotrellis_addresses.jpg>)
