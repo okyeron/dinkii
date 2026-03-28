@@ -7,4 +7,5 @@
 dinkii-neotrellis-pico/.vscode/cmake-kits.json
 dinkii-neotrellis-pico/.vscode/settings.json
 dinkii-neotrellis-pico/.vscode/tasks.json
+dinkii-neotrellis-pico/disable/MonomeSerialDevice.cpp
 /dinkii-neotrellis-pico/disable

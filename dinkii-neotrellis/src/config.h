@@ -5,12 +5,12 @@
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
+#define ONETWENTYEIGHT 3
 #define TWOFIFTYSIX 4
 
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
+// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTYEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
-#define GRIDCOUNT ONETWENTEIGHT
+#define GRIDCOUNT ONETWENTYEIGHT
 #endif
 
 #if GRIDCOUNT == SIXTEEN
@@ -21,7 +21,7 @@
   #define NUM_ROWS 8 // down - rows 
   #define NUM_COLS 8 // across - columns
 #endif
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
   #define NUM_ROWS 8 // down - rows 
   #define NUM_COLS 16 // across - columns
 #endif
@@ -40,7 +40,7 @@
 
 // This assumes you are using a USB breakout board to route power to the board 
 // If you are plugging directly into the controller, you will need to adjust this brightness to a much lower value
-#define BRIGHTNESS 127  // overall grid brightness 
+#define BRIGHTNESS 96  // overall grid brightness 
                         // may need adjustment for larger grids
                         // use gammaTable and gammaAdj below to adjust levels
 

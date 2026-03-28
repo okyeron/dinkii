@@ -52,19 +52,19 @@ If re-programming the grid software for NeoTrellis/MechaTrellis, be aware of the
 
 The idea here is that you can easily set the size of the grid and also enable a test mode.
 
-For an 8x8 gird, use a `GRIDCOUNT` value of `SIXTYFOUR`, for a 16x8 grid, use `ONETWENTEIGHT`, etc.
+For an 8x8 gird, use a `GRIDCOUNT` value of `SIXTYFOUR`, for a 16x8 grid, use `ONETWENTYEIGHT`, etc.
 
 ```
 #define TEST 0    // SET TO 1 for testing
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
+#define ONETWENTYEIGHT 3
 #define TWOFIFTYSIX 4
 
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
+// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTYEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
-#define GRIDCOUNT ONETWENTEIGHT
+#define GRIDCOUNT ONETWENTYEIGHT
 #endif
 
 ```
@@ -101,10 +101,10 @@ i2c_config should be set to the 8x8 addresses for this test mode.
 
 #define SIXTEEN 1
 #define SIXTYFOUR 2
-#define ONETWENTEIGHT 3
+#define ONETWENTYEIGHT 3
 #define TWOFIFTYSIX 4
 
-// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTEIGHT, TWOFIFTYSIX
+// Which Grid - SIXTEEN, SIXTYFOUR, ONETWENTYEIGHT, TWOFIFTYSIX
 #ifndef GRIDCOUNT
 #define GRIDCOUNT SIXTEEN
 #endif

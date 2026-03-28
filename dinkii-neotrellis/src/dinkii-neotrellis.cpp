@@ -69,7 +69,7 @@ int prevLedBuffer[mdp.MAXLEDCOUNT];
   };
 #endif
 
-#if GRIDCOUNT == ONETWENTEIGHT
+#if GRIDCOUNT == ONETWENTYEIGHT
   // 16x8
   Adafruit_NeoTrellis trellis_array[NUM_ROWS / 4][NUM_COLS / 4] = {
     { Adafruit_NeoTrellis(addrRowOne[0], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[1], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[2], &MYWIRE), Adafruit_NeoTrellis(addrRowOne[3], &MYWIRE)}, // top row
@@ -99,6 +99,36 @@ uint32_t Wheel(byte WheelPos) {
    return seesaw_NeoPixel::Color(0, WheelPos * 3, 255 - WheelPos * 3);
   }
   return 0;
+}
+
+
+// ***************************************************************************
+// **                                SEND LEDS                              **
+// ***************************************************************************
+
+void sendLeds(){
+  uint8_t value, prevValue = 0;
+  uint32_t hexColor;
+  bool isDirty = false;
+  
+  for(int i=0; i< NUM_ROWS * NUM_COLS; i++){
+    value = mdp.leds[i];
+    prevValue = prevLedBuffer[i];
+    uint8_t gvalue = gammaTable[value] * gammaAdj;
+    
+    if (value != prevValue) {
+      //hexColor = (((R * value) >> 4) << 16) + (((G * value) >> 4) << 8) + ((B * value) >> 4); 
+      hexColor =  (((gvalue*R)/256) << 16) + (((gvalue*G)/256) << 8) + (((gvalue*B)/256) << 0);
+      trellis.setPixelColor(i, hexColor);
+
+      prevLedBuffer[i] = value;
+      isDirty = true;
+    }
+  }
+  if (isDirty) {
+    trellis.show();
+  }
+
 }
 
 // ***************************************************************************
@@ -151,7 +181,7 @@ void setup(){
     serialNumberOne = String(serial_id[i], DEC); 
     serialNumberTwo.concat(serialNumberOne);
   }
-  String tempSerial = serialNumberTwo.substring(9);
+  String tempSerial = serialNumberTwo.substring(10);
   tempSerial.setCharAt(0, 'm');
   TinyUSBDevice.setSerialDescriptor(tempSerial.c_str());
 
@@ -238,35 +268,6 @@ void setup(){
       delay(50);
   }
   #endif
-
-}
-
-// ***************************************************************************
-// **                                SEND LEDS                              **
-// ***************************************************************************
-
-void sendLeds(){
-  uint8_t value, prevValue = 0;
-  uint32_t hexColor;
-  bool isDirty = false;
-  
-  for(int i=0; i< NUM_ROWS * NUM_COLS; i++){
-    value = mdp.leds[i];
-    prevValue = prevLedBuffer[i];
-    uint8_t gvalue = gammaTable[value] * gammaAdj;
-    
-    if (value != prevValue) {
-      //hexColor = (((R * value) >> 4) << 16) + (((G * value) >> 4) << 8) + ((B * value) >> 4); 
-      hexColor =  (((gvalue*R)/256) << 16) + (((gvalue*G)/256) << 8) + (((gvalue*B)/256) << 0);
-      trellis.setPixelColor(i, hexColor);
-
-      prevLedBuffer[i] = value;
-      isDirty = true;
-    }
-  }
-  if (isDirty) {
-    trellis.show();
-  }
 
 }
 
