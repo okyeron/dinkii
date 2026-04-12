@@ -267,11 +267,9 @@ extern "C" void device_init() {
         trellis.show();
         sleep_ms(100);
         trellis.setPixelColor(0, 0x000000);
-        trellis.show();
+        trellis.show();   
     }
 
-    // Force a full LED flush on the first sendLeds
-    memset(prevLedBuffer, -1, sizeof(prevLedBuffer));
 }
 
 extern "C" void device_task() {

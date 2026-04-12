@@ -1,7 +1,6 @@
 #include "MonomeSerialDevice.h"
 // #include "debug.h"
 
-
 MonomeSerialDevice::MonomeSerialDevice() {}
 
 void MonomeSerialDevice::initialize() {
@@ -46,7 +45,7 @@ void MonomeSerialDevice::getDeviceInfo() {
 
 void MonomeSerialDevice::poll() {
     //while (isMonome && Serial.available()) { processSerial(); };
-    while (tud_cdc_available()) {
+    if (tud_cdc_available()) {
       processSerial();
     }
     //Serial.println("processSerial");
@@ -121,7 +120,7 @@ void MonomeSerialDevice::refresh() {
                 led = (y << 4) + x;
                 buf[ind++] = (leds[led] << 4) | leds[led + 1];
             }
-        tud_cdc_write(buf, 35);
+        tud_cdc_write_char(buf, 35);
         
         ind = 3;
         buf[1] = 8;
@@ -130,7 +129,7 @@ void MonomeSerialDevice::refresh() {
                 led = (y << 4) + x;
                 buf[ind++] = (leds[led] << 4) | leds[led + 1];
             }
-        tud_cdc_write(buf, 35);
+        tud_cdc_write_char(buf, 35);
         
         ind = 3;
         buf[1] = 0;
@@ -140,7 +139,7 @@ void MonomeSerialDevice::refresh() {
                 led = (y << 4) + x;
                 buf[ind++] = (leds[led] << 4) | leds[led + 1];
             }
-        tud_cdc_write(buf, 35);
+        tud_cdc_write_char(buf, 35);
 
         ind = 3;
         buf[1] = 8;
@@ -149,7 +148,7 @@ void MonomeSerialDevice::refresh() {
                 led = (y << 4) + x;
                 buf[ind++] = (leds[led] << 4) | leds[led + 1];
             }
-        tud_cdc_write(buf, 35);
+        tud_cdc_write_char(buf, 35);
         
         gridDirty = false;
     }
@@ -162,129 +161,74 @@ void MonomeSerialDevice::refresh() {
         ind = 2;
         for (led = 0; led < 64; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
         
         buf[1] = 1;
         ind = 2;
         for (led = 64; led < 128; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
 
         buf[1] = 2;
         ind = 2;
         for (led = 128; led < 192; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
         
         buf[1] = 3;
         ind = 2;
         for (led = 192; led < 256; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
         
         buf[1] = 4;
         ind = 2;
         for (led = 256; led < 320; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
 
         buf[1] = 5;
         ind = 2;
         for (led = 320; led < 384; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
 
         buf[1] = 6;
         ind = 2;
         for (led = 384; led < 448; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
 
         buf[1] = 7;
         ind = 2;
         for (led = 448; led < 512; led += 2)
             buf[ind++] = (leds[led] << 4) | leds[led + 1];
-        tud_cdc_write(buf, 34);
+        tud_cdc_write_char(buf, 34);
 
         arcDirty = 0;
     }
 */
 }
 
-// length is inclusive of cmd byte
-uint8_t MonomeSerialDevice::get_cmd_length( uint8_t cmd ) {
-  switch(cmd) {
-    case 0x00:   return 1;
-    case 0x01:   return 1;
-    case 0x02:   return 33;
-    case 0x03:   return 1;
-    case 0x04:   return 4;
-    case 0x05:   return 1;
-    case 0x06:   return 3;
-    case 0x07:   return 1;
-    case 0x08:   return 3;
-    case 0x0F:   return 9;
-    
-    case 0x10:   return 3;
-    case 0x11:   return 3;
-    case 0x12:   return 1;
-    case 0x13:   return 1;
-    case 0x14:   return 11;
-    case 0x15:   return 4;
-    case 0x16:   return 4;
-    case 0x17:   return 2;
-    case 0x18:   return 4;
-    case 0x19:   return 2;
-    case 0x1A:   return 35;
-    case 0x1B:   return 7;
-    case 0x1C:   return 7;
-
-    case 0x20:   return 3;
-    case 0x21:   return 3;
-    case 0x50:   return 3;
-    case 0x51:   return 2;
-    case 0x52:   return 2;
-    case 0x80:   return 9;
-    case 0x81:   return 8;
-
-    case 0x90:   return 4;
-    case 0x91:   return 3;
-    case 0x92:   return 34;
-    case 0x93:   return 5;
-    case 0x94:   return 2;
-  }
-  return 0;
-}
-
-
 void MonomeSerialDevice::processSerial() {
+    uint8_t identifierSent;  // command byte sent from controller to matrix
     uint8_t index, readX, readY, readN, readA;
-    uint8_t dummy, gridNum, deviceAddress;
+    uint8_t dummy, gridNum, deviceAddress;  // for reading in data not used by the matrix
     uint8_t n, x, y, z, i;
     uint8_t intensity = 15;
     uint8_t gridKeyX;
     uint8_t gridKeyY;
-    int8_t  delta;
-    uint8_t gridX    = columns;
+    int8_t delta;
+    uint8_t gridX    = columns;          // Will be either 8 or 16
     uint8_t gridY    = rows;
     uint8_t numQuads = columns/rows;
-
+    
     // get command identifier: first byte of packet is identifier in the form: [(a << 4) + b]
     // a = section (ie. system, key-grid, digital, encoder, led grid, tilt)
     // b = command (ie. query, enable, led, key, frame)
-    uint8_t identifierSent = tud_cdc_read_char();
 
-    uint8_t len = get_cmd_length(identifierSent);
-    if (len == 0) return;  // unknown command
-
-    uint8_t remaining = len - 1;
-    uint8_t buf[34];  // max remaining bytes for any command (35 - 1 cmd byte)
-    if (remaining > 0) {
-        if (tud_cdc_n_available(0) < remaining) return;
-        tud_cdc_n_read(0, buf, remaining);
-    }
-    uint8_t buf_idx = 0;  // buffer read index
-
+    identifierSent = tud_cdc_read_char();  
+    
     switch (identifierSent) {
         case 0x00:  // device information
         	// [null, "led-grid", "key-grid", "digital-out", "digital-in", "encoder", "analog-in", "analog-out", "tilt", "led-ring"]
@@ -294,8 +238,8 @@ void MonomeSerialDevice::processSerial() {
             tud_cdc_write_char((uint8_t)numQuads);   // one Quad is 64 buttons
 
             tud_cdc_write_char((uint8_t)0x00); // send again with 2 = key-grid
-            tud_cdc_write_char((uint8_t)0x02); //
-            tud_cdc_write_char((uint8_t)numQuads);
+            tud_cdc_write_char((uint8_t)0x02); // 
+            tud_cdc_write_char((uint8_t)numQuads); 
             tud_cdc_n_write_flush(0);
 
             break;
@@ -316,7 +260,7 @@ void MonomeSerialDevice::processSerial() {
             //Serial.println("0x02");
             deviceID.clear();
             for (int i = 0; i < 32; i++) {  // has to be 32
-                deviceID += (char)buf[buf_idx++];
+                deviceID += (char)tud_cdc_read_char();
             }
             tud_cdc_n_write_flush(0);
             break;
@@ -332,51 +276,53 @@ void MonomeSerialDevice::processSerial() {
 
         case 0x04:  // system / report ADDR
             //Serial.println("0x04");
-            gridNum = buf[buf_idx++];        // grid number
-            readX   = buf[buf_idx++];        // x offset
-            readY   = buf[buf_idx++];        // y offset
+            gridNum = tud_cdc_read_char();        // grid number
+            readX = tud_cdc_read_char();          // x offset
+            readY = tud_cdc_read_char();          // y offset 
             break;
 
         case 0x05:  // _SYS_GET_GRID_SIZE
             //Serial.println("0x05");
             tud_cdc_write_char((uint8_t)0x03);             // system / request grid size
-            tud_cdc_write_char((uint8_t)gridX);            // gridX
-            tud_cdc_write_char((uint8_t)gridY);            // gridY
+            tud_cdc_write_char((uint8_t)gridX);                // gridX
+            tud_cdc_write_char((uint8_t)gridY);                // gridY
             tud_cdc_n_write_flush(0);
             break;
 
         case 0x06:
-            readX = buf[buf_idx++];          // system / set grid size - ignored
-            readY = buf[buf_idx++];
+            readX = tud_cdc_read_char();          // system / set grid size - ignored
+            readY = tud_cdc_read_char();
             break;
 
         case 0x07:
             break;                              // I2C get addr (scan) - ignored
 
         case 0x08:
-            deviceAddress = buf[buf_idx++];     // I2C set addr - ignored
-            dummy         = buf[buf_idx++];
+            deviceAddress = tud_cdc_read_char();     // I2C set addr - ignored
+            dummy = tud_cdc_read_char();
             break;
+
 
         case 0x0F:  // system / report firmware version
             // Serial.println("0x0F");
             for (int i = 0; i < 8; i++) {  // 8 character string
-              dummy = buf[buf_idx++];
+              dummy = tud_cdc_read_char();
+                //Serial.print(tud_cdc_read_char());
             }
             break;
 
 
       // 0x10-0x1F are for an LED Grid Control.  All bytes incoming, no responses back
-
+  
         case 0x10:            // /prefix/led/set x y [0/1]  / led off
-          readX = buf[buf_idx++];
-          readY = buf[buf_idx++];
+          readX = tud_cdc_read_char();
+          readY = tud_cdc_read_char();
           setGridLed(readX, readY, 0);
           break;
 
         case 0x11:            // /prefix/led/set x y [0/1]   / led on
-          readX = buf[buf_idx++];
-          readY = buf[buf_idx++];
+          readX = tud_cdc_read_char();
+          readY = tud_cdc_read_char();
           setGridLed(readX, readY, 15);   // need global brightness variable?
           break;
 
@@ -389,35 +335,35 @@ void MonomeSerialDevice::processSerial() {
           break;
 
         case 0x14:                  // /prefix/led/map x y d[8]  / map (frame)
-          readX = buf[buf_idx++];
+          readX = tud_cdc_read_char();
           while (readX > 16) { readX += 16; }         // hacky shit to deal with negative numbers from rotation
           readX &= 0xF8;                              // floor the offset to 0 or 8
 
-          readY = buf[buf_idx++];                           // y offset
+          readY = tud_cdc_read_char();                      // y offset
           while (readY > 16) { readY += 16; }         // hacky shit to deal with negative numbers from rotation
           readY &= 0xF8;                              // floor the offset to 0 or 8
 
           for (y = 0; y < 8; y++) {               // each i will be a row
-            intensity = buf[buf_idx++];               // read one byte of 8 bits on/off
-
+            intensity = tud_cdc_read_char();            // read one byte of 8 bits on/off
+    
             for (x = 0; x < 8; x++) {             // for 8 LEDs on a row
               if ((intensity >> x) & 0x01) {      // if intensity bit set, light led full brightness
-                setGridLed(readX + x, readY + y, 15);
+                setGridLed(readX + x, readY + y, 15); 
               }
               else {
-                setGridLed(readX + x, readY + y, 0);
+                setGridLed(readX + x, readY + y, 0); 
               }
             }
           }
           break;
 
         case 0x15:                                //  /prefix/led/row x y d
-          readX = buf[buf_idx++];                           // led-grid / set row
+          readX = tud_cdc_read_char();                      // led-grid / set row
           while (readX > 16) { readX += 16; }         // hacky shit to deal with negative numbers from rotation
           readX &= 0xF8;                              // floor the offset to 0 or 8
 
-          readY     = buf[buf_idx++];
-          intensity = buf[buf_idx++];                       // read one byte of 8 bits on/off
+          readY = tud_cdc_read_char();                      // 
+          intensity = tud_cdc_read_char();                  // read one byte of 8 bits on/off
 
           for (x = 0; x < 8; x++) {               // for the next 8 lights in row
             if ((intensity >> x) & 0x01) {        // if intensity bit set, light led full brightness
@@ -430,13 +376,13 @@ void MonomeSerialDevice::processSerial() {
           break;
 
         case 0x16:                                //  /prefix/led/col x y d
-          readX = buf[buf_idx++];                           // led-grid / column set
+          readX = tud_cdc_read_char();                      // led-grid / column set
 
-          readY = buf[buf_idx++];
+          readY = tud_cdc_read_char();
           while (readY > 16) { readY += 16; }         // hacky shit to deal with negative numbers from rotation
           readY &= 0xF8;                              // floor the offset to 0 or 8
 
-          intensity = buf[buf_idx++];                       // read one byte of 8 bits on/off
+          intensity = tud_cdc_read_char();                  // read one byte of 8 bits on/off
 
           for (y = 0; y < 8; y++) {               // for the next 8 lights in column
             if ((intensity >> y) & 0x01) {        // if intensity bit set, light led full brightness
@@ -448,46 +394,45 @@ void MonomeSerialDevice::processSerial() {
 
           break;
 
-        case 0x17:                                    //  /prefix/led/intensity i
-          intensity = buf[buf_idx++];                 // set brightness for entire grid
-          if (intensity>15) break;                   
+        case 0x17:                                     //  /prefix/led/intensity i
+          intensity = tud_cdc_read_char();                      // set brightness for entire grid
           // this is probably not right
           setAllLEDs(intensity);
+
           break;
 
         case 0x18:                                //  /prefix/led/level/set x y i
-          readX     = buf[buf_idx++];                        // led-grid / set LED intensity
-          readY     = buf[buf_idx++];                        // read the x and y coordinates
-          intensity = buf[buf_idx++];                        // read the intensity
-          setGridLed(readX, readY, intensity);
+          readX = tud_cdc_read_char();                      // led-grid / set LED intensity
+          readY = tud_cdc_read_char();                      // read the x and y coordinates
+          intensity = tud_cdc_read_char();                  // read the intensity
+          setGridLed(readX, readY, intensity);              
           break;
 
         case 0x19:                               //  /prefix/led/level/all s
-          intensity = buf[buf_idx++];                        // set all leds
-          if (intensity>15) break;   
-          setAllLEDs(intensity);
+          intensity = tud_cdc_read_char();                 // set all leds
+          setAllLEDs(intensity);              
           break;
 
         case 0x1A:                               //   /prefix/led/level/map x y d[64]
-                                                 // set 8x8 block
-          readX = buf[buf_idx++];                            // x offset
+                                                 // set 8x8 block          
+          readX = tud_cdc_read_char();                      // x offset
           while (readX > 16) { readX += 16; }         // hacky shit to deal with negative numbers from rotation
           readX &= 0xF8;                              // floor the offset to 0 or 8
-          readY = buf[buf_idx++];                            // y offset
+          readY = tud_cdc_read_char();                      // y offset
           while (readY > 16) { readY += 16; }         // hacky shit to deal with negative numbers from rotation
           readY &= 0xF8;                              // floor the offset to 0 or 8
-
+          
           z = 0;
           for (y = 0; y < 8; y++) {
             for (x = 0; x < 8; x++) {
-              if (z % 2 == 0) {
-                intensity = buf[buf_idx++];
+              if (z % 2 == 0) {                    
+                intensity = tud_cdc_read_char();
                 if ( ((intensity >> 4) & 0x0F) > variMonoThresh) {  // even bytes, use upper nybble
                   setGridLed(readX + x, readY + y, (intensity >> 4) & 0x0F);
                 } else {
                   setGridLed(readX + x, readY + y, 0);
                 }
-              } else {
+              } else { 
                 if ((intensity & 0x0F) > variMonoThresh ) {      // odd bytes, use lower nybble
                   setGridLed(readX + x, readY + y, intensity & 0x0F);
                 } else {
@@ -497,25 +442,31 @@ void MonomeSerialDevice::processSerial() {
               z++;
             }
           }
+         /*
+          } else {
+            for (int q = 0; q<32; q++){
+              tud_cdc_read_char();
+            }
+          }*/
           break;
 
         case 0x1B:                                // /prefix/led/level/row x y d[8]
-          readX = buf[buf_idx++];                            // x offset
+          readX = tud_cdc_read_char();                      // x offset
           while (readX > 16) { readX += 16; }         // hacky shit to deal with negative numbers from rotation
           readX &= 0xF8;                              // floor the offset to 0 or 8
-          readY = buf[buf_idx++];                            // y offset
+          readY = tud_cdc_read_char();                      // y offset
           while (readY > 16) { readY += 16; }         // hacky shit to deal with negative numbers from rotation
           readY &= 0xF8;                              // floor the offset to 0 or 8
           for (x = 0; x < 8; x++) {
-              if (x % 2 == 0) {
-                intensity = buf[buf_idx++];
+              if (x % 2 == 0) {                    
+                intensity = tud_cdc_read_char();
                 if ( (intensity >> 4 & 0x0F) > variMonoThresh) {  // even bytes, use upper nybble
                   setGridLed(readX + x, readY, (intensity >> 4) & 0x0F);
                 }
                 else {
                   setGridLed(readX + x, readY, 0);
                 }
-              } else {
+              } else {                              
                 if ((intensity & 0x0F) > variMonoThresh ) {      // odd bytes, use lower nybble
                   setGridLed(readX + x, readY, intensity & 0x0F);
                 }
@@ -527,22 +478,22 @@ void MonomeSerialDevice::processSerial() {
           break;
 
         case 0x1C:                                // /prefix/led/level/col x y d[8]
-          readX = buf[buf_idx++];                            // x offset
+          readX = tud_cdc_read_char();                      // x offset
           while (readX > 16) { readX += 16; }         // hacky shit to deal with negative numbers from rotation
           readX &= 0xF8;                              // floor the offset to 0 or 8
-          readY = buf[buf_idx++];                            // y offset
+          readY = tud_cdc_read_char();                      // y offset
           while (readY > 16) { readY += 16; }         // hacky shit to deal with negative numbers from rotation
           readY &= 0xF8;                              // floor the offset to 0 or 8
           for (y = 0; y < 8; y++) {
-              if (y % 2 == 0) {
-                intensity = buf[buf_idx++];
+              if (y % 2 == 0) {                    
+                intensity = tud_cdc_read_char();
                 if ( (intensity >> 4 & 0x0F) > variMonoThresh) {  // even bytes, use upper nybble
                   setGridLed(readX, readY + y, (intensity >> 4) & 0x0F);
                 }
                 else {
                   setGridLed(readX, readY + y, 0);
                 }
-              } else {
+              } else {                              
                 if ((intensity & 0x0F) > variMonoThresh ) {      // odd bytes, use lower nybble
                   setGridLed(readX, readY + y, intensity & 0x0F);
                 }
@@ -564,8 +515,9 @@ void MonomeSerialDevice::processSerial() {
              structure: [0x20, x, y]
              description: key up at (x,y)
              */
-            gridKeyX = buf[buf_idx++];
-            gridKeyY = buf[buf_idx++];
+
+            gridKeyX = tud_cdc_read_char();
+            gridKeyY = tud_cdc_read_char();
             addGridEvent(gridKeyX, gridKeyY, 0);
             /*
             Serial.print("grid key: ");
@@ -575,7 +527,7 @@ void MonomeSerialDevice::processSerial() {
             Serial.print(" up - ");
             */
             break;
-
+            
         case 0x21:
             /*
              0x21 key-grid / key down
@@ -583,8 +535,8 @@ void MonomeSerialDevice::processSerial() {
              structure: [0x21, x, y]
              description: key down at (x,y)
              */
-            gridKeyX = buf[buf_idx++];
-            gridKeyY = buf[buf_idx++];
+            gridKeyX = tud_cdc_read_char();
+            gridKeyY = tud_cdc_read_char();
             addGridEvent(gridKeyX, gridKeyY, 1);
             /*
             Serial.print("grid key: ");
@@ -604,8 +556,9 @@ void MonomeSerialDevice::processSerial() {
             // d = delta
             //  (-128)-127 (two's comp 8 bit)
             // description: encoder position change
-            index = buf[buf_idx++];
-            delta = (int8_t)buf[buf_idx++];
+
+            index = tud_cdc_read_char();
+            delta = tud_cdc_read_char();
             addArcEvent(index, delta);
             /*
             Serial.print("Encoder: ");
@@ -618,7 +571,7 @@ void MonomeSerialDevice::processSerial() {
 
         case 0x51:  // /prefix/enc/key n (key up)
             // Serial.println("0x51");
-            n = buf[buf_idx++];
+            n = tud_cdc_read_char();
             /*
             Serial.print("key: ");
             Serial.print(n);
@@ -633,7 +586,7 @@ void MonomeSerialDevice::processSerial() {
 
         case 0x52:  // /prefix/enc/key n (key down)
             // Serial.println("0x52");
-            n = buf[buf_idx++];
+            n = tud_cdc_read_char();
             /*
             Serial.print("key: ");
             Serial.print(n);
@@ -646,18 +599,18 @@ void MonomeSerialDevice::processSerial() {
             // description: encoder switch down
             break;
 
-        case 0x80:  //   tilt / active response - 9 total bytes [0x01, d]
+        case 0x80:  //   tilt / active response - 9 bytes [0x01, d]
             for (int i = 0; i < 9; i++) {  // 9 bytes
-              dummy = buf[buf_idx++];  // consume bytes
+              dummy = tud_cdc_read_char();  // consume bytes
             }
             break;
         case 0x81:  //   tilt - 8 bytes [0x80, n, xh, xl, yh, yl, zh, zl]
             for (int i = 0; i < 8; i++) {  // 8 bytes
-              dummy = buf[buf_idx++];  // consume bytes
+              dummy = tud_cdc_read_char();  // consume bytes
             }
             break;
 
-        // 0x90 variable 64 LED ring
+        // 0x90 variable 64 LED ring 
         case 0x90:
           //pattern:  /prefix/ring/set n x a
           //desc:   set led x of ring n to value a
@@ -665,32 +618,32 @@ void MonomeSerialDevice::processSerial() {
           //      x = led number
           //      a = value (0-15)
           //serial:   [0x90, n, x, a]
-          readN = buf[buf_idx++];
-          readX = buf[buf_idx++];
-          readA = buf[buf_idx++];
+          readN = tud_cdc_read_char();
+          readX = tud_cdc_read_char();
+          readA = tud_cdc_read_char();
           //led_array[readN][readX] = readA;
-          setArcLed(readN, readX, readA);
+          setArcLed(readN, readX, readA);         
           break;
-
+     
         case 0x91:
           //pattern:  /prefix/ring/all n a
           //desc:   set all leds of ring n to a
           //args:   n = ring number
           //      a = value
           //serial:   [0x91, n, a]
-          readN = buf[buf_idx++];
-          readA = buf[buf_idx++];
+          readN = tud_cdc_read_char();
+          readA = tud_cdc_read_char();
           for (int q=0; q<64; q++){
             setArcLed(readN, q, readA);
             //led_array[readN][q]=readA;
           }
           break;
-
+      
         case 0x92:
-          //pattern:  /prefix/ring/map n d[64]
+          //pattern:  /prefix/ring/map n d[32]
           //desc:   set leds of ring n to array d
           //args:   n = ring number
-          //      d[64] = 64 states, 4 bit values, in 32 consecutive bytes
+          //      d[32] = 64 states, 4 bit values, in 32 consecutive bytes
           //      d[0] (0:3) value 0
           //      d[0] (4:7) value 1
           //      d[1] (0:3) value 2
@@ -698,19 +651,19 @@ void MonomeSerialDevice::processSerial() {
           //      d[31] (0:3) value 62
           //      d[31] (4:7) value 63
           //serial:   [0x92, n d[32]]
-          readN = buf[buf_idx++];
+          readN = tud_cdc_read_char();
           for (y = 0; y < 64; y++) {
-              if (y % 2 == 0) {
-                intensity = buf[buf_idx++];
+              if (y % 2 == 0) {                    
+                intensity = tud_cdc_read_char();
                 if ( (intensity >> 4 & 0x0F) > 0) {  // even bytes, use upper nybble
                   //led_array[readN][y] = (intensity >> 4 & 0x0F);
-                  setArcLed(readN, y, (intensity >> 4 & 0x0F));
+                  setArcLed(readN, y, (intensity >> 4 & 0x0F)); 
                 }
                 else {
                   //led_array[readN][y]=0;
-                  setArcLed(readN, y, 0);
+                  setArcLed(readN, y, 0);   
                 }
-              } else {
+              } else {                              
                 if ((intensity & 0x0F) > 0 ) {      // odd bytes, use lower nybble
                   //led_array[readN][y] = (intensity & 0x0F);
                   setArcLed(readN, y, (intensity & 0x0F));
@@ -731,12 +684,12 @@ void MonomeSerialDevice::processSerial() {
           //      x2 = ending position
           //      a = value
           //serial:   [0x93, n, x1, x2, a]
-          readN = buf[buf_idx++];
-          readX = buf[buf_idx++];  // x1
-          readY = buf[buf_idx++];  // x2
-          readA = buf[buf_idx++];
+          readN = tud_cdc_read_char();
+          readX = tud_cdc_read_char();  // x1
+          readY = tud_cdc_read_char();  // x2
+          readA = tud_cdc_read_char();
           //memset(led_array[readN],0,sizeof(led_array[readN]));
-
+      
           if (readX < readY){
             for (y = readX; y <= readY; y++) {
               setArcLed(readN, y, readA);
@@ -750,11 +703,11 @@ void MonomeSerialDevice::processSerial() {
               setArcLed(readN, x, readA);
             }
           }
-          //note:   set range x1-x2 (inclusive) to a. wrapping supported, ie. set range 60,4 would set values 60,61,62,63,0,1,2,3,4.
-          // always positive direction sweep. ie. 4,10 = 4,5,6,7,8,9,10 whereas 10,4 = 10,11,12,13...63,0,1,2,3,4
+          //note:   set range x1-x2 (inclusive) to a. wrapping supported, ie. set range 60,4 would set values 60,61,62,63,0,1,2,3,4. 
+          // always positive direction sweep. ie. 4,10 = 4,5,6,7,8,9,10 whereas 10,4 = 10,11,12,13...63,0,1,2,3,4 
          break;
 
-        default:
+        default: 
           break;
     }
 }
@@ -818,7 +771,7 @@ void MonomeEventQueue::sendArcDelta(uint8_t index, int8_t delta) {
     buf[0] = 0x50;
     buf[1] = index;
     buf[2] = delta;
-    tud_cdc_write(buf, sizeof(buf));
+    tud_cdc_write_char(buf, sizeof(buf));
     */
 }
 
