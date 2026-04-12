@@ -246,7 +246,8 @@ extern "C" void device_init() {
     memset(local_leds,   0, sizeof(local_leds));
     memset(mmap,         0, sizeof(mmap));
     memset(prevLedBuffer, 0, sizeof(prevLedBuffer));
-    sendLeds_iii();
+    
+    // sendLeds_iii(); // do we need this here?
 
     gpio_put(LED_PIN, 0);
 
@@ -387,7 +388,7 @@ extern "C" void device_monome_loop() {
         mdp.poll();
         sleep_ms(100);
     }
-    mdp.getDeviceInfo();
+    
 
     mdp.setAllLEDs(0);
     sendLeds_monome();
