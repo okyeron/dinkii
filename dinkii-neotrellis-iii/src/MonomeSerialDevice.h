@@ -89,12 +89,13 @@ class MonomeSerialDevice : public MonomeEventQueue {
         uint8_t leds[MAXLEDCOUNT];
         std::string deviceID;
         
-    private : 
+    private :
         bool arcDirty = false;
         bool gridDirty = false;
-        
+
 //        MonomeSerialDevice();
         void processSerial();
+        static uint8_t get_cmd_length(uint8_t cmd);
 };
 
 #endif

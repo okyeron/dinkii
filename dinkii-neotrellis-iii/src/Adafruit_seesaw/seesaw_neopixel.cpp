@@ -297,3 +297,43 @@ void seesaw_NeoPixel::clear() {
 }
 
 void seesaw_NeoPixel::setBrightness(uint8_t b) { brightness = b; }
+
+// Update pixel buffer only — no I2C write. Call flushAll() to push all at once.
+void seesaw_NeoPixel::storePixelColor(uint16_t n, uint32_t c) {
+  if (n >= numLEDs || !pixels) return;
+  uint8_t r = (uint8_t)(c >> 16), g = (uint8_t)(c >> 8), b = (uint8_t)c;
+  if (brightness) {
+    r = (r * brightness) >> 8;
+    g = (g * brightness) >> 8;
+    b = (b * brightness) >> 8;
+  }
+  uint8_t *p;
+  if (wOffset == rOffset) {
+    p = &pixels[n * 3];
+  } else {
+    p = &pixels[n * 4];
+    uint8_t w = (uint8_t)(c >> 24);
+    p[wOffset] = brightness ? ((w * brightness) >> 8) : w;
+  }
+  p[rOffset] = r;
+  p[gOffset] = g;
+  p[bOffset] = b;
+}
+
+// Send the entire pixel buffer to the seesaw in chunked I2C transactions.
+// The seesaw firmware I2C receive buffer is ~32 bytes total (including 2 reg
+// bytes + 2 offset bytes), leaving ~28 bytes per transaction for pixel data.
+// Using 24 bytes (8 pixels) per chunk keeps each I2C packet at 28 bytes, well
+// within the limit, and requires only 2 writes for a 16-pixel RGB tile.
+void seesaw_NeoPixel::flushAll() {
+  if (!pixels || numBytes == 0) return;
+  static const uint8_t CHUNK = 24;  // bytes of pixel data per I2C write (8 pixels)
+  uint8_t writeBuf[2 + CHUNK];
+  for (uint16_t offset = 0; offset < numBytes; offset += CHUNK) {
+    uint8_t chunkLen = (numBytes - offset > CHUNK) ? CHUNK : (uint8_t)(numBytes - offset);
+    writeBuf[0] = (uint8_t)(offset >> 8);
+    writeBuf[1] = (uint8_t)(offset & 0xFF);
+    memcpy(&writeBuf[2], pixels + offset, chunkLen);
+    this->write(SEESAW_NEOPIXEL_BASE, SEESAW_NEOPIXEL_BUF, writeBuf, 2 + chunkLen);
+  }
+}

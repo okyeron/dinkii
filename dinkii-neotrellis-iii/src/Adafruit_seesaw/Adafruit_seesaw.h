@@ -36,11 +36,13 @@ typedef unsigned char byte;
 #define INPUT 0x0
 #define OUTPUT 0x1
 #define INPUT_PULLUP 0x2
-#define I2C_PORT i2c1
 
-
+#ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
 
 /*=========================================================================
     REGISTERS

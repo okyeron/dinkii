@@ -26,14 +26,18 @@
  *
  */
 
-#include "Adafruit_seesaw.h"
-// #include <Arduino.h>
 #include "pico/stdlib.h"
+#include <string.h>
+#include "Adafruit_seesaw.h"
+
+#ifndef min
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
 
 //#define SEESAW_I2C_DEBUG
-
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 /*!
  *****************************************************************************************
@@ -95,6 +99,7 @@ bool Adafruit_seesaw::begin(uint8_t addr, int8_t flow, bool reset) {
   if (reset) {
     found = false;
     SWReset();
+    sleep_ms(10);
     for (int retries = 0; retries < 10; retries++) {
       if (_i2c_dev->detected()) {
         found = true;
@@ -123,6 +128,7 @@ bool Adafruit_seesaw::begin(uint8_t addr, int8_t flow, bool reset) {
         (c == SEESAW_HW_ID_CODE_TINY1617)) {
       found = true;
       _hardwaretype = c;
+      break;
     }
 
     sleep_ms(10);
@@ -898,9 +904,9 @@ bool Adafruit_seesaw::write8(byte regHigh, byte regLow, byte value) {
  *
  *  @return     the value between 0 and 255 read from the passed register
  ****************************************************************************************/
-uint8_t Adafruit_seesaw::read8(byte regHigh, byte regLow, uint16_t sleep_ms) {
+uint8_t Adafruit_seesaw::read8(byte regHigh, byte regLow, uint16_t delay_us) {
   uint8_t ret;
-  this->read(regHigh, regLow, &ret, 1, sleep_ms);
+  this->read(regHigh, regLow, &ret, 1, delay_us);
 
   return ret;
 }
@@ -914,13 +920,13 @@ uint8_t Adafruit_seesaw::read8(byte regHigh, byte regLow, uint16_t sleep_ms) {
  *SEESAW_STATUS_VERSION)
  *	@param		buf the buffer to read the bytes into
  *	@param		num the number of bytes to read.
- *	@param		sleep_ms an optional sleep_ms in between setting the read
+ *	@param		delay_us an optional delay_us in between setting the read
  *register and reading out the data. This is required for some seesaw functions
  *(ex. reading ADC data)
  *  @returns    True on I2C read success
  ****************************************************************************************/
 bool Adafruit_seesaw::read(uint8_t regHigh, uint8_t regLow, uint8_t *buf,
-                           uint8_t num, uint16_t sleep_ms) {
+                           uint8_t num, uint16_t delay_us) {
   uint8_t pos = 0;
   uint8_t prefix[2];
   prefix[0] = (uint8_t)regHigh;
@@ -940,7 +946,7 @@ bool Adafruit_seesaw::read(uint8_t regHigh, uint8_t regLow, uint8_t *buf,
     }
 
     // TODO: tune this
-    sleep_us(sleep_ms);
+    sleep_us(delay_us);
 
     // if (_flow != -1) {
     //   while (!::digitalRead(_flow))
@@ -1026,13 +1032,15 @@ size_t Adafruit_seesaw::write(uint8_t character) {
  *  @return     number of bytes written (not including trailing 0)
  *********************************************************************/
 size_t Adafruit_seesaw::write(const char *str) {
-  uint8_t buf[32];
-  uint8_t len = 0;
-  while (*str) {
-    buf[len] = *str;
-    str++;
-    len++;
+  size_t len = strlen(str);
+  size_t written = 0;
+  // Send in 30-byte chunks: leaves 2 bytes for the register prefix within
+  // a 32-byte I2C buffer, so this is safe on both Arduino and Pico.
+  while (written < len) {
+    uint8_t chunk = (uint8_t)min(30, len - written);
+    this->write(SEESAW_SERCOM0_BASE, SEESAW_SERCOM_DATA,
+                (uint8_t *)(str + written), chunk);
+    written += chunk;
   }
-  this->write(SEESAW_SERCOM0_BASE, SEESAW_SERCOM_DATA, buf, len);
   return len;
 }

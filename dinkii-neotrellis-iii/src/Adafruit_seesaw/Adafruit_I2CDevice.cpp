@@ -54,25 +54,19 @@ static void i2c_bus_recovery(void) {
     }
 }
 
-bool Adafruit_I2CDevice::begin(bool addr_detect ) 
+bool Adafruit_I2CDevice::begin(bool addr_detect)
 {
-    poll_delay_ms(200);
-    
-    // Recover I2C bus in case a device is holding SDA low
-    i2c_bus_recovery();
-    
-    i2c_init(I2C_PORT, I2C_BAUDRATE);
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_SDA);
-    gpio_pull_up(I2C_SCL);
-    
-    //   i2c_init(I2C_PORT, 100 * 1000);
-
-    //  gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    // gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    //   gpio_pull_up(I2C_SDA);
-    // gpio_pull_up(I2C_SCL);
+    static bool i2c_initialised = false;
+    if (!i2c_initialised) {
+        poll_delay_ms(200);
+        i2c_bus_recovery();
+        i2c_init(I2C_PORT, I2C_BAUDRATE);
+        gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
+        gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
+        gpio_pull_up(I2C_SDA);
+        gpio_pull_up(I2C_SCL);
+        i2c_initialised = true;
+    }
     return true;
 };
 
@@ -88,19 +82,18 @@ bool Adafruit_I2CDevice::detected(void)
 
 bool Adafruit_I2CDevice::read(uint8_t *buffer, size_t len, bool stop)
 {
-    i2c_read_blocking(I2C_PORT, _addr, buffer, len, !stop); // stop is a guess
-    return true;
+    int ret = i2c_read_blocking(I2C_PORT, _addr, buffer, len, !stop);
+    return ret >= 0;
 };
 
-uint8_t bigbuf[255];
-bool Adafruit_I2CDevice::write(const uint8_t *buffer, size_t len, bool stop , const uint8_t *prefix_buffer, size_t prefix_len)
+bool Adafruit_I2CDevice::write(const uint8_t *buffer, size_t len, bool stop, const uint8_t *prefix_buffer, size_t prefix_len)
 {
+    uint8_t bigbuf[255];
     size_t C = 0;
-    if (prefix_buffer != 0 && prefix_len > 0) for (int i = 0;i<prefix_len;i++) bigbuf[C++] = prefix_buffer[i];
-    if (buffer != 0 && len > 0) for (int i = 0;i<len;i++) bigbuf[C++] = buffer[i];
-    int count = i2c_write_blocking(I2C_PORT, _addr, bigbuf, C, !stop);
-
-    return true;
+    if (prefix_buffer != 0 && prefix_len > 0) for (size_t i = 0; i < prefix_len; i++) bigbuf[C++] = prefix_buffer[i];
+    if (buffer != 0 && len > 0) for (size_t i = 0; i < len; i++) bigbuf[C++] = buffer[i];
+    int ret = i2c_write_blocking(I2C_PORT, _addr, bigbuf, C, !stop);
+    return ret >= 0;
 };
 
 bool Adafruit_I2CDevice::write_then_read(const uint8_t *write_buffer, size_t write_len, uint8_t *read_buffer, size_t read_len, bool stop)

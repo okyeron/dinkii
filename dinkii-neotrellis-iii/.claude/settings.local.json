@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s https://raw.githubusercontent.com/adafruit/Adafruit_Seesaw/master/Adafruit_NeoTrellis.h)",
+      "Bash(curl -s https://raw.githubusercontent.com/adafruit/Adafruit_Seesaw/master/Adafruit_NeoTrellis.cpp)",
+      "Bash(curl -s https://raw.githubusercontent.com/adafruit/Adafruit_BusIO/master/Adafruit_I2CDevice.cpp)"
+    ]
+  }
+}

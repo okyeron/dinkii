@@ -107,6 +107,8 @@ public:
       setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w),
       setPixelColor(uint16_t n, uint32_t c), setBrightness(uint8_t), clear(),
       updateLength(uint16_t n), updateType(neoPixelType t);
+  void storePixelColor(uint16_t n, uint32_t c); // update buffer only, no I2C
+  void flushAll();  // send entire pixel buffer in one I2C transaction
   uint8_t *getPixels(void) const, getBrightness(void) const;
   int8_t getPin(void) { return pin; };
   uint16_t numPixels(void) const;
