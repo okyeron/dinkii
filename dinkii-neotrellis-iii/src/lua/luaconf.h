@@ -126,14 +126,14 @@
 
 
 /* Default configuration ('long long' and 'double', for 64-bit Lua) */
-#define LUA_INT_DEFAULT		LUA_INT_LONGLONG
-#define LUA_FLOAT_DEFAULT	LUA_FLOAT_DOUBLE
+#define LUA_INT_DEFAULT		LUA_INT_LONG
+#define LUA_FLOAT_DEFAULT	LUA_FLOAT_FLOAT
 
 
 /*
 @@ LUA_32BITS enables Lua with 32-bit integers and 32-bit floats.
 */
-#define LUA_32BITS	0
+#define LUA_32BITS	1
 
 
 /*
