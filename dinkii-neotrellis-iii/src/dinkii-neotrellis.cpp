@@ -79,7 +79,7 @@ int main() {
     tud_init(BOARD_TUD_RHPORT);
 
     // Give USB time to stabilize
-    sleep_ms(500);
+    sleep_ms(300);
     for (int i = 0; i < 500; i++) {
         tud_task();
         sleep_ms(1);

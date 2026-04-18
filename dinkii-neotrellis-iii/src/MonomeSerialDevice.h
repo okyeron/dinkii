@@ -95,6 +95,7 @@ class MonomeSerialDevice : public MonomeEventQueue {
         
 //        MonomeSerialDevice();
         void processSerial();
+        static uint8_t get_cmd_length(uint8_t cmd);
 };
 
 #endif
