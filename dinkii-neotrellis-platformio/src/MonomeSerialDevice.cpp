@@ -247,7 +247,7 @@ void MonomeSerialDevice::processSerial() {
             Serial.write((uint8_t)0x00); // send again with 2 = key-grid
             Serial.write((uint8_t)0x02); // 
             Serial.write((uint8_t)numQuads); 
-
+            Serial.flush();
             break;
 
         case 0x01:  // system / ID
@@ -259,6 +259,7 @@ void MonomeSerialDevice::processSerial() {
                   Serial.write((uint8_t)0x00);
                 }
             }
+            Serial.flush();
             break;
 
         case 0x02:  // system / write ID
@@ -274,6 +275,7 @@ void MonomeSerialDevice::processSerial() {
             Serial.write((uint8_t)0x01);
             Serial.write((uint8_t)0);     // x offset - could be 0 or 8  ### NEEDS grid size variable
             Serial.write((uint8_t)0);     // y offset
+            Serial.flush();
             break;
 
         case 0x04:  // system / report ADDR
@@ -288,6 +290,7 @@ void MonomeSerialDevice::processSerial() {
             Serial.write((uint8_t)0x03);             // system / request grid size
             Serial.write((uint8_t)gridX);                // gridX
             Serial.write((uint8_t)gridY);                // gridY
+            Serial.flush();
             break;
 
         case 0x06:
@@ -814,7 +817,7 @@ void MonomeEventQueue::sendArcKey(uint8_t index, uint8_t pressed) {
 }
 
 void MonomeEventQueue::sendGridKey(uint8_t x, uint8_t y, uint8_t pressed) {    
-    uint8_t buf[3];
+    uint8_t buf[2];
     if (pressed == 1){
       buf[0] = 0x21;
     }else{
@@ -824,9 +827,14 @@ void MonomeEventQueue::sendGridKey(uint8_t x, uint8_t y, uint8_t pressed) {
     buf[2]=y;
     // Serial.write(buf,3);
     
-    Serial.write((uint8_t)buf[0]);
-    Serial.write((uint8_t)buf[1]);
-    Serial.write((uint8_t)buf[2]);
+    tud_cdc_write_char((uint8_t)buf[0]);
+    tud_cdc_write_char((uint8_t)x);
+    tud_cdc_write_char((uint8_t)y);
+    tud_cdc_n_write_flush(0);
+
+    // Serial.write((uint8_t)buf[0]);
+    // Serial.write((uint8_t)buf[1]);
+    // Serial.write((uint8_t)buf[2]);
     // Serial.flush();
 }
 

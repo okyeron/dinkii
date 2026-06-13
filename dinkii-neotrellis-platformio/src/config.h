@@ -57,6 +57,6 @@ String deviceID = "monome";
 String serialNum = "m4216126";
 
 // DEVICE INFO FOR TinyUSB
-char mfgstr[32] = "monome";
-char prodstr[32] = "grid";
-char serialstr[32] = "m4216126";
+char mfgstr[7] = "monome";
+char prodstr[5] = "grid";
+char serialstr[9] = "m4216126";

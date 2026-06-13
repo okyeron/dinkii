@@ -75,6 +75,7 @@ char const* string_desc_arr [] = {
     "dinkii webusb",         // 6: Vendor
     "monome",                // 7: Manufacturer Monome
     "grid",                  // 8: Product Monome
+    "m0123456",              // 9: Serial Monome
     ""
 };
 
@@ -112,8 +113,8 @@ tusb_desc_device_t const desc_devices[2] =
     .bDescriptorType  = TUSB_DESC_DEVICE,
     .bcdUSB           = 0x0200,
     .bDeviceClass     = TUSB_CLASS_CDC,
-    .bDeviceSubClass  = 0,
-    .bDeviceProtocol  = 0,
+    .bDeviceSubClass  = MISC_SUBCLASS_COMMON,
+    .bDeviceProtocol  = MISC_PROTOCOL_IAD,
     .bMaxPacketSize0  = CFG_TUD_ENDPOINT0_SIZE,
 
     .idVendor         = USB_VID,
@@ -175,7 +176,7 @@ enum
 uint8_t const desc_fs_configuration_0[] =
 {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, STRING_LANGID, CONFIG_TOTAL_LEN_MIDI, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, STRING_LANGID, CONFIG_TOTAL_LEN_MIDI, 0x00, 100),
 
   // 1st CDC: Interface number, string index, EP notification address and size, EP data address (out, in) and size.
   TUD_CDC_DESCRIPTOR(ITF_NUM_CDC, STRING_CDC, EPNUM_CDC_NOTIF, 8, EPNUM_CDC_OUT, EPNUM_CDC_IN, 64),
@@ -236,6 +237,7 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
   (void)langid;
   uint8_t chr_count;
   memset(_desc_str, 0, sizeof(_desc_str));
+  const char* str;
   if (index == 0) {
     memcpy(&_desc_str[1], string_desc_arr[0], 2);
     chr_count = 1;
@@ -243,16 +245,21 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     chr_count = fill_serial_str("m%07d");
   } else if (index == STRING_SERIAL) {
     chr_count = fill_serial_str("%07d");
-  } else if (index < STRING_LAST) {
-    const char *str = string_desc_arr[index];
+  // } else if (index < STRING_LAST) {
+  } else {
+    if (!(index < sizeof(string_desc_arr) / sizeof(string_desc_arr[0]))) return NULL;
+    // const char *str = string_desc_arr[index];
+    str = string_desc_arr[index];
     chr_count = strlen(str);
-    if (chr_count > 31)
-      chr_count = 31;
+    size_t const max_count = sizeof(_desc_str) / sizeof(_desc_str[0]) - 1; // -1 for string type
+		if (chr_count > max_count) chr_count = max_count;
+    // if (chr_count > 31)
+    //   chr_count = 31;
     for (uint8_t i = 0; i < chr_count; i++) {
       _desc_str[1 + i] = str[i];
     }
-  } else
-  return NULL;
+  } // else str = string_desc_arr[index];
+  // return NULL;
   _desc_str[0] = (TUSB_DESC_STRING << 8) | (2 * chr_count + 2);
   return _desc_str;
 }

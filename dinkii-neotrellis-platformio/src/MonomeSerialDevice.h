@@ -2,6 +2,7 @@
 #define MONOMESERIAL_H
 
 #include <Arduino.h>
+#include "tusb.h"
 
 class MonomeGridEvent {
     public:
